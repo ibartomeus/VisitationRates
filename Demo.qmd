@@ -6,7 +6,7 @@ editor: visual
 
 ## Abstract
 
-While the positive effect of pollinators on crop production has been clearly demonstrated, crop level predictions of how pollination rates increase crops reproductive success remains elusive and requires time consuming experiments. Defining the functional form of this relationships is of pivotal importance to understand when pollination is limiting, and develop operational visitation rate values that can be used by practitioners to rapidly assess pollination levels. Given the large variety of crops, and varieties, running this experiments for all of them is unlikely to be achieved. Here we propose and test a generalized model based on biological first principles to infer optimal pollinator visitation rates for multiple crops. First we show that a non-inflicted functional form fits well empirical data. Second, we develop a flexible model to produce this functional forms from easy to obtain plant and pollinator traits such as selfing rates, ovule number and single visit effective pollen deposition and test its sensitivity to the certainty in those initial values. Finally, we apply our framework to X case studies to show the advantages and limitations of the framework.
+While the positive effect of pollinators on crop production has been clearly demonstrated, crop level predictions of how pollination rates increase crops reproductive success remains elusive and requires time consuming experiments. Defining the functional form of this relationships is of pivotal importance to understand when pollination is limiting, and develop operational visitation rate values that can be used by practitioners to rapidly assess pollination levels. Given the large variety of crops, and varieties, running this experiments for all of them is unlikely to be achieved. Here we propose and test a generalized model based on biological first principles to infer optimal pollinator visitation rates for multiple crops. First we show that a non-inflicted functional form fits well empirical data. Second, we develop a flexible model to produce this functional forms from easy to obtain plant and pollinator traits such as selfing rates, ovule number, and single visit efficiency, and test its sensitivity to the certainty in those initial values. Finally, we apply our framework to X case studies to show the advantages and limitations of the framework.
 
 ## Mechanistic model
 
@@ -20,7 +20,7 @@ First we load the functions.
 source(file = "functions.R")
 ```
 
-Second we can visualize the shape of the curve:
+Second we can visualize the shape of the curve. Note `a` is given in %:
 
 ```{r}
 plot_visits(a = 20, b = 200, c = 0.2, from_ = 0, to_ = 50, add = FALSE)
@@ -28,9 +28,6 @@ plot_visits(a = 20, b = 190, c = 0.2, from_ = 0, to_ = 50, add = T)
 plot_visits(a = 20, b = 180, c = 0.2, from_ = 0, to_ = 50, add = T)
 plot_visits(a = 20, b = 170, c = 0.2, from_ = 0, to_ = 50, add = T)
 plot_visits(a = 20, b = 160, c = 0.2, from_ = 0, to_ = 50, add = T)
-
-
-#check what happens on the intercept a (a is in %??)
 ```
 
 Third, we can fit the a, b and c params if we have a dataset relating visitation rates to seed set. Mike might have those.
@@ -39,8 +36,7 @@ Third, we can fit the a, b and c params if we have a dataset relating visitation
 #Create a fake dataset
 visits <- c(0,2,4,6,9,15)
 seedset <- c(0,10,12,18,19,20)
-(mf <- fit_data(seedset = seedset, visitation = visits))
-#ADD SE to output and plots.
+(mf <- fit_data(seedset = seedset, visitation = visits, simplify = TRUE)) #simplify = FALSE gives SE.
 #Also add option to estimate only c, or only b and c.
 #Test fit
 plot(seedset ~ visits, xlim = c(0,16), ylim = c(0, 20))
@@ -108,51 +104,57 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = 5, add_ = TRUE)
 
 Beans they don't care about pollinators.
 
-Fourth, we derive a generalized version that rely on first principles and does not require hard won data. To that end, we set b as the maximum seed set a flower can attain (see below for plant or plot level metrics). This can be extracted from the crop basic biology, as it will match the ovule production, a parameter often easy to obtain from the literature or to simply obtain an average by counting ovules/seeds in the field. Parameter a can be approximated knowing plants selfing rates. That is, who many seeds the flower produce under no pollination. This information is available in the literature (e.g. Klein et al. 2007) or can be calculated with basic experiments. The trickier parameter to calculate is c. For this, we rely on pollinator per visit efficiency. Many studies measure seed set, pollen tube development or pollen deposition after a single visit. This values (especially the first two values) can be used to extrapolate how many visits a flower requires until fertilizing all its ovules. The average pollinator efficiency can be calculated across pollinators, which is the representative metric. This data is already collected for many crops, (is expected to vary less among crops and pollinators See Vazquez et al. 2005) and can be collected in the field if necessary. However, it is known that each subsequent visit is less efficient (Kendall et al.), hence we can penalize each consecutive visit by a %. Which % can be informed by data in the few crops for which this information exists, and sensitivity analysis can be done in the importance of this parameter (see below).
+Fourth, we derive a generalized version that rely on first principles and does not require hard won data. To that end, we set `b` as the maximum seed set a flower can attain (see below for plant or plot level metrics). This can be extracted from the crop basic biology, as it will match the ovule production, a parameter often easy to obtain from the literature or to simply obtain an average by counting ovules/seeds in the field. Parameter `a` , given in % of seedset without pollinators, can be approximated knowing plants selfing rates. That is, who many seeds the flower produce under no pollination. This information is available in the literature (e.g. Klein et al. 2007) or can be calculated with basic experiments. The trickier parameter to calculate is c. For this, we rely on pollinator per visit efficiency. Many studies measure seed set, pollen tube development or pollen deposition after a single visit. This values (especially seed set) can be used to extrapolate how many visits a flower requires until fertilizing all its ovules. The average pollinator efficiency can be calculated across pollinators, which is the representative metric, or calculated by insect group. This data is already collected for many crops, (and is expected to vary less among crops and pollinators according to Vazquez et al. 2005 and Kleijn et al 2015) and can be collected in the field if necessary. However, it is known that each subsequent visit is less efficient (Kendall et al.), hence we can penalize each consecutive visit by a % (a diminishing returns function). Which % can be informed biologically, we expect this diminishing returns should approach `b`. Sensitivity analysis can be done in the importance of this parameter (see below).
 
 With this, we can explore different scenarios:
 
 ```{r}
-calculate_visits(a = 0, b = 100, SVD = 10, loss = 0.1, from_ = 0, to_ = 100, 
-                             plot_ = TRUE, col_ = 2)
-#we can calculate loss as % decrease from linea relationship
-```
-
-A crop that do not produce any seed without pollinators, has 100 ovules and pollinators fertilize a mean of 10 pollen grains per visit, with a penalization of 10%. In this case the black dots represents the pollen grain deposition as the number of visits increases. The red line is the fit of the mechanistic model. In this case, they both reflect the same story. The interpretation is that 30 visits per flower is optimal.
-
-```{r}
-calculate_visits(a = 0, b = 100, SVD = 15, loss = 0.1, from_ = 0, to_ = 100, 
+c_val <- calculate_visits(a = 0, b = 100, SVD = 10, to_ = 100, 
                              plot_ = TRUE, col_ = 2)
 ```
 
-Here, all params are the same, but average pollen deposition is higher. Hence, seed set (red line) saturates faster than pollination, which overshoots. Optimal visits is \~15 and beyond this number, we risk adding too many pollen, which can have different consequences depending on the crop (e.g. damage or pollen interference).
+A crop that do not produce any seed without pollinators, has 100 ovules and pollinators fertilize a mean of 10 pollen grains per visit, needs a penalization of 0.1. In this case the black dots represents the pollen grain deposition as the number of visits increases. The red line is the fit of the mechanistic model. The interpretation is that 30 visits per flower is optimal, but we can calculate this.
 
 ```{r}
-calculate_visits(a = 0, b = 100, SVD = 7, loss = 0.1, from_ = 0, to_ = 100, 
-                             plot_ = TRUE, col_ = 2)
+calculate_required_visits(c_val = c_val$c_parameter, b = 100, a = 20, target_percent = 0.95)
 ```
 
-Here, in contrast, average pollen deposition is lower (7). I think this situation is unlikely to happen in nature, because it indicates natural pollination will never be optimal. I think this indicates the model is mis-specified. For example, we migh be underestimating single visit efficiencies, or penalizing too much consecutive visits. Let's see this last option:
+The number of visits to achive 95% of the seed set is \~26.
+
+## Real world test
+
+Let's compare the mechanistic and real data using apple. Using Siopa et al. pollinator dependance (PD), the average PD for apple is 0.73 (Selfing = 0.29). There is a huge variation among varieties, we can ask Mike about his variety to enhance the model. According to google AI, typical flowers contains 10 ovules. Single visit efficiency is collected from Eerarets et al 2025 (data not provided, but I'll ask Maxime). Let's assume is 7 (50%+ selfing).
 
 ```{r}
-calculate_visits(a = 0, b = 100, SVD = 7, loss = 0.06, from_ = 0, to_ = 100, 
+c_val <- calculate_visits(a = 29, b = 10, SVD = 7, to_ = 100, 
                              plot_ = TRUE, col_ = 2)
 ```
 
 ```{r}
-#try with mikes data
-calculate_visits(a = 3, b = 6, SVD = 2, loss = 0.6, from_ = 0, to_ = 5, 
-                             plot_ = TRUE, col_ = 2)
-#why a and the plotted intercept are not equal?
+#try with mikes apple data
+apple <- read.csv(file = "data/apple.csv")
+#head(apple)
+#unique(apple$Pollinator) #[1] "Bombus terrestris"    "Apis mellifera"       #"Episyrphus balteatus" "Osmia bicornis"      
+apple <- subset(apple, Pollinator %in% c("Apis mellifera", "Osmia bicornis", "Control"))
+(mf <- fit_data(seedset = apple$SeedNumber, visitation = apple$VisitNumber))
+#Test fit
+plot(apple$SeedNumber ~ jitter(apple$VisitNumber), las = 1, xlab = "visits", ylab = "seed set")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = 5, add_ = TRUE)
+plot_visits(a = 29, b = 10, c = c_val$c_parameter, to_ = 5, add_ = TRUE, col_ = 3)
+
 ```
 
-Yes, if we reduce the penalty to a 6%, we have plausible numbers again.
+Well, this is not terrible, `a` differs as expected because of variety. `b` in real data is lower, most likely due to other non-pollinator related factors. Most importantly, the number of visits required for 95% is similar:
 
-# Caveats:
+```{r}
+calculate_required_visits(c_val = c_val$c_parameter, b = 10, a = 29, target_percent = 0.95)
+```
+
+## Caveats:
 
 -   We assume optimal conditions of water, light, nutrients, and no other limiting factors. This is why linking seed set to yield is tricky. However, if yield is reduced, while pollination is optimal, we know other factors are limiting for ovule/fruit development
 
--   We work at the flower level. As we model idealized flowers, and extrapolate to thousands of flowers per crop, relying on averages (e.g. pollinator efficiency) is apropiate.
+-   We work at the flower level. As we model idealized flowers, and extrapolate to thousands of flowers per crop, relying on averages (e.g. pollinator efficiency) is appropiate.
 
 -   We can quickly convert visits per m2 and hour (relevant measure for agronomists) to visits per flower if we know flower density and number of hours flowers are open. e.g.:
 
@@ -160,10 +162,4 @@ Yes, if we reduce the penalty to a 6%, we have plausible numbers again.
     V_transect_to_flower(V_transect = 50, flw_x_m2 = 400, lifespan = 6)
     ```
 
-<!-- -->
-
--   We now eyeball optimal visitation, but we can calculate visits needed to reach 05% of seed set.
-
 -   We can use elasticities to see which params have more influence in the outputs.
-
--   We can aproximate the loss to fit the b param autmatically.
