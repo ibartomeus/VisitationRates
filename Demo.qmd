@@ -67,6 +67,8 @@ osr <- read.csv(file = "data/osr.csv")
 #head(osr)
 osr <- subset(osr, pollinator != "Hand")
 #unique(osr$visitation)
+#unique(osr$pollinator)
+osr <- subset(osr, pollinator %in% c("BB", "HB", "OR", "Closed"))
 #osr[which(is.na(osr$visitation)),]
 osr$visitation <- as.factor(osr$visitation)
 levels(osr$visitation) <- c("3", "1")
