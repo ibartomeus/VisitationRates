@@ -16,16 +16,21 @@ plot_visits <- function(a, b, c, from_ = 0, to_ = 1, add_ = FALSE, col_ = 2){
 #plot_visits(a = 30, b = 200, c = 10, add = FALSE)
 
 fit_data <- function(seedset, visitation, a_start = 0, b_start = 10, c_start = 0.5,
-                     simplify = TRUE){
+                     simplify = "params"){
   nlmod3 <- nls(seedset ~  ((b*a)/100) + (b-((b*a)/100)) * (1-exp(-c*visitation)), 
                 start = list(a = a_start, b = b_start,c = c_start),
                 control= nls.control(maxiter = 1000))
   #summary(nlmod3)
-  if(simplify == TRUE){
-    coef(nlmod3)
-    }else{
-    summary(nlmod3)$coefficients
+  if(simplify == "params"){
+    out <- coef(nlmod3)
+    }
+  if(simplify == "stats"){
+    out <- summary(nlmod3)$coefficients
   }
+  if(simplify == "model"){
+    out <- nlmod3
+  }
+  out
 }
 
 calculate_visits0 <- function(a, b, SVD, loss = 0.1, to_ = 100, 
@@ -151,3 +156,9 @@ calculate_required_visits <- function(c_val, b, a, target_percent = 0.95) {
 #calculate_required_visits(c_val = my_c$c_parameter, b = 100, a = 20)
 #abline(v=4.8)
 
+pseudeR2 <- function(model, seedset){
+  RSS <- sum(residuals(model)^2)
+  TSS <- sum((seedset - mean(seedset))^2)
+  pseudo_R2 <- 1 - (RSS / TSS) 
+  pseudo_R2
+}
