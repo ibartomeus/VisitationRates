@@ -1,0 +1,61 @@
+---
+title: "Predictions of optimal visitation rates for crops using simple mechanistic models"
+format: html
+editor: visual
+---
+
+## Abstract
+
+## Introduction
+
+## Methods
+
+This R formula describes a **seed set model** that accounts for two different ways a plant can produce seeds: through **autonomous self-pollination** (selfing) and through **pollinator-assisted fertilization** (outcrossing).
+
+In mathematical notation, the equation looks like this:
+
+\$\$Seedset = \\left( \\frac{b \\cdot a}{100} \\right) + \\left( b - \\frac{b \\cdot a}{100} \\right) \\cdot (1 - e\^{-c \\cdot visitation})\$\$
+
+The formula is split into two main parts: a **fixed baseline** and a **variable growth curve**.
+
+#### The Baseline (Autonomous Seed Set)
+
+> `((b * a) / 100)`
+
+-   This represents the seeds produced **without any pollinators**.
+
+-   $b$: The maximum potential seed set (total capacity).
+
+-   $a$: The percentage of that maximum that can be achieved through self-pollination (e.g., if $a=20$, the plant can fill 20% of its seeds by itself).
+
+#### The Pollinator Contribution
+
+> `(b - ((b * a) / 100)) * (1 - exp(-c * visitation))`
+
+-   This represents the "remaining" seed potential that requires pollinators.
+
+-   $(b - \text{Baseline})$: This is the "room for improvement." It ensures that as pollinators arrive, they only fill the seeds that haven't already been self-pollinated.
+
+-   $(1 - \exp(-c \cdot \text{visitation}))$: This is an **exponential saturation curve**. It starts at 0 and climbs toward 1 as the number of visits increases.
+
+-   $c$: The efficiency parameter. A higher $c$ means the plant reaches its maximum seed set with very few pollinator visits.
+
+This model is often used in ecology to show that there is a "diminishing return" on pollinator visits.
+
+-   **If Visitation = 0**: The entire second half of the equation becomes 0. You are left only with the baseline: the seeds the plant makes by itself.
+
+-   **As Visitation Increases**: The seed set grows quickly at first, then slows down as it approaches the maximum limit ($b$).
+
+## Results
+
+Scheme:
+
+Fig 1: Theoretical explanation of the modelling framework. A plot showing a, b, c, and how they can be estimated, including the SVE trick.
+
+Fig2: Prove that the theoretical model is a good fit to the data, using \~ 5 crops, we can show that our model fits better (or equal) the data than a linear or cuadratic model. See Real_crops.qmd for analysis.
+
+Fig 3: A test of how our model behaves agaisnt real data. Using the same \~5 crops, we can compare empirially derived a, b, c and optimal visitation rate (OVR) parameters, with a, b and c and OVR predictions in a scatter plot with the 1:1 line plotted. I expect despite over predicting b, OVR will be fair.
+
+Fig 4: Description of our model predictions for all EU crops (or as much as possible). We can plot OVR as a function of a, b and SVE params as a measure of sensitivity analysis. Maybe a boxplot of OVR per crop family would be nice too.
+
+Fig5: Case study on how to go from generic predictions to tailored predictions for your crop. Using Blueberry data, we show can we can fit different varieties, and different pollinator communities. See Fig5.qmd for an advance plot on this.
