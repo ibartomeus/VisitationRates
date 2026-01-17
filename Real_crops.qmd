@@ -1,0 +1,231 @@
+---
+title: "Real crops"
+format: pdf
+editor: visual
+---
+
+## Crop selection
+
+We will explore:
+
+-   Garratt Apple data
+
+-   Kendall Blueberry data
+
+-   Chirila Lima Bean data
+
+-   Kandori Strawberry data
+
+-   (Di Trani Watermelon data)
+
+## Fit nls's
+
+Load functions and data
+
+```{r}
+source(file = "functions.R")
+
+dat <- read.csv("data/VisitationRates_Data.csv")
+#make a dataset per crop
+unique(dat$Crop)
+LimaBean <- subset(dat, Crop == "Lima.bean")
+Strawberry <- subset(dat, Crop == "Strawberry") 
+SHighbushBlueberry <- subset(dat, Crop == "Southern.Highbush.Blueberry")  
+NHighbushBlueberry <- subset(dat, Crop == "Northern.Highbush.Blueberry")
+Rabbiteye.Blueberry <- subset(dat, Crop == "Rabbiteye.Blueberry")
+Apple <- subset(dat, Crop == "Apple")
+```
+
+### Apple
+
+```{r}
+#head(Apple)
+#unique(Apple$Pollinator) #[1] "Bombus terrestris"    "Apis mellifera"       #"Episyrphus balteatus" "Osmia bicornis"      
+#apple <- subset(apple, Pollinator %in% c("Apis mellifera", "Osmia bicornis", "Control"))
+
+#fit models
+model_nls <- fit_data(seedset = Apple$PollinationValue, visitation = Apple$Number.of.visits, simplify = "model")
+model_lm <- lm(Apple$PollinationValue ~ Apple$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = Apple)
+
+#Test fit
+AIC_nls <- AIC(model_nls) #2790
+AIC_lm <- AIC(model_lm) #2834
+AIC_cuadratic <- AIC(model_cuadratic) #2823
+
+#Extract R2
+pseudeR2(model_nls, Apple$PollinationValue) #0.09
+summary(model_lm)$r.squared #0.01
+summary(model_cuadratic)$r.squared #0.03
+
+#Extract a, b and c values
+mf <- fit_data(seedset = Apple$PollinationValue, visitation = Apple$Number.of.visits, simplify = "params")
+
+#Plot
+plot(Apple$PollinationValue ~ jitter(Apple$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+
+```
+
+Best fit according to AIC is our nls model.
+
+### Lima Bean
+
+```{r}
+#head(LimaBean)
+#unique(LimaBean$Pollinator) #"Apis mellifera"    
+#unique(LimaBean$PollinationMetric) #"Apis mellifera"    
+
+#fit models
+model_nls <- fit_data(seedset = LimaBean$PollinationValue, visitation = LimaBean$Number.of.visits, simplify = "model")
+model_lm <- lm(LimaBean$PollinationValue ~ LimaBean$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = LimaBean)
+
+#Test fit
+AIC_nls <- AIC(model_nls) #608
+AIC_lm <- AIC(model_lm) #606
+AIC_cuadratic <- AIC(model_cuadratic) #608
+
+#Extract R2
+pseudeR2(model_nls, LimaBean$PollinationValue) #0.06
+summary(model_lm)$r.squared #0.06
+summary(model_cuadratic)$r.squared #0.06
+
+#Extract a, b and c values
+mf <- fit_data(seedset = LimaBean$PollinationValue, visitation = LimaBean$Number.of.visits, simplify = "params")
+
+#Plot
+plot(LimaBean$PollinationValue ~ jitter(LimaBean$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+```
+
+All models perform equally bad...
+
+### Southern Highbush Blueberry
+
+```{r}
+#head(SHighbushBlueberry)
+#unique(SHighbushBlueberry$Pollinator) 
+#unique(SHighbushBlueberry$PollinationMetric)  
+
+SHighbushBlueberry <- subset(SHighbushBlueberry, PollinationMetric == "Fruit.weight")
+
+#fit models
+model_nls <- fit_data(seedset = SHighbushBlueberry$PollinationValue, 
+                      visitation = SHighbushBlueberry$Number.of.visits, simplify = "model")
+model_lm <- lm(SHighbushBlueberry$PollinationValue ~ SHighbushBlueberry$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = SHighbushBlueberry)
+
+#Test fit
+AIC_nls <- AIC(model_nls) #176
+AIC_lm <- AIC(model_lm) #175
+AIC_cuadratic <- AIC(model_cuadratic) #176
+
+#Extract R2
+pseudeR2(model_nls, SHighbushBlueberry$PollinationValue) #0.20
+summary(model_lm)$r.squared #0.19
+summary(model_cuadratic)$r.squared #0.20
+
+#Extract a, b and c values
+mf <- fit_data(seedset = SHighbushBlueberry$PollinationValue, 
+               visitation = SHighbushBlueberry$Number.of.visits, simplify = "params")
+
+#Plot
+plot(SHighbushBlueberry$PollinationValue ~ jitter(SHighbushBlueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", col = "grey")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(SHighbushBlueberry$Number.of.visits), 
+            add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+```
+
+Quite similar fits again...
+
+### Northern Highbush Blueberry
+
+```{r}
+#head(NHighbushBlueberry)
+#unique(NHighbushBlueberry$Pollinator) 
+#unique(NHighbushBlueberry$PollinationMetric) 
+
+NHighbushBlueberry <- subset(NHighbushBlueberry, PollinationMetric == "Fruit.weight")
+
+#fit models
+model_nls <- fit_data(seedset = NHighbushBlueberry$PollinationValue, 
+                      visitation = NHighbushBlueberry$Number.of.visits, simplify = "model")
+model_lm <- lm(NHighbushBlueberry$PollinationValue ~ NHighbushBlueberry$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = NHighbushBlueberry)
+
+#Test fit
+AIC_nls <- AIC(model_nls) #937
+AIC_lm <- AIC(model_lm) #939
+AIC_cuadratic <- AIC(model_cuadratic) #935
+
+#Extract R2
+pseudeR2(model_nls, NHighbushBlueberry$PollinationValue) #0.14
+summary(model_lm)$r.squared #0.13
+summary(model_cuadratic)$r.squared #0.14
+
+#Extract a, b and c values
+mf <- fit_data(seedset = NHighbushBlueberry$PollinationValue, 
+               visitation = NHighbushBlueberry$Number.of.visits, simplify = "params")
+
+#Plot
+plot(NHighbushBlueberry$PollinationValue ~ jitter(NHighbushBlueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", col = "grey")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(NHighbushBlueberry$Number.of.visits), 
+            add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+```
+
+Quite similar fits again...
+
+### Rabbiteye Blueberry
+
+```{r}
+#head(Rabbiteye.Blueberry)
+#unique(Rabbiteye.Blueberry$Pollinator) 
+#unique(Rabbiteye.Blueberry$PollinationMetric) 
+
+Rabbiteye.Blueberry <- subset(Rabbiteye.Blueberry, PollinationMetric == "Fruit.weight")
+
+#fit models
+model_nls <- fit_data(seedset = Rabbiteye.Blueberry$PollinationValue, 
+                      visitation = Rabbiteye.Blueberry$Number.of.visits, simplify = "model")
+model_lm <- lm(Rabbiteye.Blueberry$PollinationValue ~ Rabbiteye.Blueberry$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = Rabbiteye.Blueberry)
+
+#Test fit
+AIC_nls <- AIC(model_nls) #20
+AIC_lm <- AIC(model_lm) #18
+AIC_cuadratic <- AIC(model_cuadratic) #19
+
+#Extract R2
+pseudeR2(model_nls, Rabbiteye.Blueberry$PollinationValue) #0.02
+summary(model_lm)$r.squared #0.02
+summary(model_cuadratic)$r.squared #0.02
+
+#Extract a, b and c values
+mf <- fit_data(seedset = Rabbiteye.Blueberry$PollinationValue, 
+               visitation = Rabbiteye.Blueberry$Number.of.visits, simplify = "params")
+
+#Plot
+plot(Rabbiteye.Blueberry$PollinationValue ~ jitter(Rabbiteye.Blueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", col = "grey")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(Rabbiteye.Blueberry$Number.of.visits), 
+            add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+```
+
+Quite similar fits again...
