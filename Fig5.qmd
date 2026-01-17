@@ -1,0 +1,123 @@
+---
+title: "Flexibility of the models"
+format: html
+editor: visual
+---
+
+## Refining models
+
+We showed that with basic data, we can generate plausible functional forms for many crops, and estimate their expected optimal visitation rates. However, those are quite coarse. Our models also allow refining this predictions if the right data is available.
+
+We will use detailed data collected by Kendall et al. 2024 in blueberry to first predict the relationship between visitation and fruit weight for different varieties, and second to different pollinator communities.
+
+Load functions and data
+
+```{r}
+source(file = "functions.R")
+
+dat <- read.csv("data/VisitationRates_Data.csv")
+#make a dataset per crop
+SHighbushBlueberry <- subset(dat, Crop == "Southern.Highbush.Blueberry")  
+SHighbushBlueberry <- subset(SHighbushBlueberry, PollinationMetric == "Fruit.weight")
+NHighbushBlueberry <- subset(dat, Crop == "Northern.Highbush.Blueberry")
+NHighbushBlueberry <- subset(NHighbushBlueberry, PollinationMetric == "Fruit.weight")
+Rabbiteye.Blueberry <- subset(dat, Crop == "Rabbiteye.Blueberry")
+Rabbiteye.Blueberry <- subset(Rabbiteye.Blueberry, PollinationMetric == "Fruit.weight")
+```
+
+## Varieties
+
+First, we can calculate, a, b and c parameters for each variety.
+
+```{r}
+#We can use quantiles, but mean of 0 and and max visits, or simply min and max, might also work.
+
+#For SHB
+SHB_a_real <- quantile(subset(SHighbushBlueberry, 
+                          Number.of.visits == 0)$PollinationValue)[2]
+SHB_b <- quantile(subset(SHighbushBlueberry, 
+                     Number.of.visits == 15)$PollinationValue)[4]
+SHB_SVE <- mean(subset(SHighbushBlueberry, 
+                       Number.of.visits == 1)$PollinationValue)
+#We need a in %
+SHB_a <- (SHB_a_real/ SHB_b)*100
+
+#For NHB
+NHB_a_real <- quantile(subset(NHighbushBlueberry, 
+                          Number.of.visits == 0)$PollinationValue)[2]
+NHB_b <- quantile(subset(NHighbushBlueberry, 
+                     Number.of.visits == 10)$PollinationValue)[4]
+NHB_SVE <- mean(subset(NHighbushBlueberry, 
+                       Number.of.visits == 1)$PollinationValue)
+#We need a in %
+NHB_a <- (NHB_a_real/ NHB_b)*100
+
+#For REB
+REB_a_real <- quantile(subset(Rabbiteye.Blueberry, 
+                          Number.of.visits == 0)$PollinationValue)[2]
+REB_b <- quantile(subset(Rabbiteye.Blueberry, 
+                     Number.of.visits == 15)$PollinationValue)[4]
+REB_SVE <- mean(subset(Rabbiteye.Blueberry, 
+                       Number.of.visits == 1)$PollinationValue)
+#We need a in %
+REB_a <- (REB_a_real/ REB_b)*100
+
+#calculate param c
+SHB_c <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE, to_ = 15)$c_parameter
+NHB_c <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE, to_ = 15)$c_parameter
+REB_c <- calculate_visits(a = REB_a, b = REB_b, SVD = REB_SVE, to_ = 15)$c_parameter
+#now we can plot all three
+plot(SHighbushBlueberry$PollinationValue ~ jitter(SHighbushBlueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", type = "n",
+     ylim = c(0,4), xlim = c(0,15))
+plot_visits(SHB_a, SHB_b, SHB_c, to_ = 15, 
+            add_ = TRUE, col = "#223366")
+plot_visits(NHB_a, NHB_b, NHB_c, to_ = 15, 
+            add_ = TRUE, col = "#A3B18A")
+plot_visits(REB_a, REB_b, REB_c, to_ = 15, 
+            add_ = TRUE, col = "#B9D1EA")
+
+```
+
+## Pollinator community
+
+We can also predict how different pollinator communities might affect yield. For this we focus on Northern Highbush blueberry. We compare a mix of pollinators, vs honeybees dominated vs bumblebee dominated communities.
+
+```{r}
+#For NHB
+NHB_a_real <- quantile(subset(NHighbushBlueberry, 
+                          Number.of.visits == 0)$PollinationValue)[2]
+#We need a in %
+NHB_a <- (NHB_a_real/ NHB_b)*100
+NHB_b <- quantile(subset(NHighbushBlueberry, 
+                     Number.of.visits == 10)$PollinationValue)[4]
+#pollinators available
+unique(NHighbushBlueberry$Pollinator)
+NHBmix <- subset(NHighbushBlueberry, Pollinator == "mix")
+NHBhb <- subset(NHighbushBlueberry, Pollinator == "Apis.mellifera")
+NHBbb <- subset(NHighbushBlueberry, Pollinator == "Bombus.terrestris")
+
+#calculate different SVD values
+NHB_SVE_mix <- mean(subset(NHBmix, 
+                       Number.of.visits == 2)$PollinationValue)/2
+NHB_SVE_hb <- mean(subset(NHBhb, 
+                       Number.of.visits == 1)$PollinationValue)
+NHB_SVE_bb <- mean(subset(NHBbb, 
+                       Number.of.visits == 1)$PollinationValue)
+
+
+#calculate param c
+NHB_c_mix <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE_mix, to_ = 15)$c_parameter
+NHB_c_hb <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE_hb, to_ = 15)$c_parameter
+NHB_c_bb <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE_bb, to_ = 15)$c_parameter
+#now we can plot all three
+plot(NHighbushBlueberry$PollinationValue ~ jitter(NHighbushBlueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", type = "n",
+     ylim = c(0,4), xlim = c(0,15))
+plot_visits(NHB_a, NHB_b, NHB_c_mix, to_ = 15, 
+            add_ = TRUE, col = "#D55E00")
+plot_visits(NHB_a, NHB_b, NHB_c_hb, to_ = 15, 
+            add_ = TRUE, col = "#E69F00")
+plot_visits(NHB_a, NHB_b, NHB_c_bb, to_ = 15, 
+            add_ = TRUE, col = "")
+```
