@@ -41,7 +41,7 @@ Apple <- subset(dat, Crop == "Apple")
 ```{r}
 #head(Apple)
 #unique(Apple$Pollinator) #[1] "Bombus terrestris"    "Apis mellifera"       #"Episyrphus balteatus" "Osmia bicornis"      
-#apple <- subset(apple, Pollinator %in% c("Apis mellifera", "Osmia bicornis", "Control"))
+#Apple <- subset(Apple, Pollinator %in% c("Apis mellifera", "Osmia bicornis", "Control"))
 
 #fit models
 model_nls <- fit_data(seedset = Apple$PollinationValue, visitation = Apple$Number.of.visits, simplify = "model")
@@ -72,7 +72,47 @@ curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)),
 
 Best fit according to AIC is our nls model.
 
-### Lima Bean
+### Strawberry
+
+```{r}
+#head(Strawberry)
+#table(Strawberry$Pollinator)  
+#unique(Strawberry$PollinationMetric)
+#needed?
+Strawberry <- subset(Strawberry, Pollinator %in% c("Apis mellifera", "Andrena.spp", "Ceratina.spp"))
+
+
+#fit models
+model_nls <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "model",
+                      a_start = 10, b_start = 100, c_start = 0.5)
+model_lm <- lm(Strawberry$PollinationValue ~ Strawberry$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = Strawberry)
+
+#Test fit
+AIC_nls <- AIC(model_nls) #6784
+AIC_lm <- AIC(model_lm) #6783
+AIC_cuadratic <- AIC(model_cuadratic) #6784
+
+#Extract R2
+pseudeR2(model_nls, Strawberry$PollinationValue) #0.1
+summary(model_lm)$r.squared #0.09
+summary(model_cuadratic)$r.squared #0.1
+
+#Extract a, b and c values
+mf <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "params", a_start = 10, b_start = 100, c_start = 0.5)
+
+#Plot
+plot(Strawberry$PollinationValue ~ jitter(Strawberry$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", xlim = c(0,30))
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = 30, add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+```
+
+All models perform equally bad...
+
+## Lima Bean
 
 ```{r}
 #head(LimaBean)
