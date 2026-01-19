@@ -81,48 +81,46 @@ plot_visits(REB_a, REB_b, REB_c, to_ = 15,
 
 ## Pollinator community
 
-We can also predict how different pollinator communities might affect yield. For this we focus on Northern Highbush blueberry. We compare a mix of pollinators, vs honeybees dominated vs bumblebee dominated communities.
+We can also predict how different pollinator communities might affect yield. For this we focus on Southern Highbush blueberry. We compare a mix of pollinators, vs honeybees dominated vs *Tetragonula carbonaria* dominated communities.
 
 ```{r}
-
-#Note try better for SHB, as it can be nicer for thier pollinators.
-
-
-#For NHB
-NHB_a_real <- quantile(subset(NHighbushBlueberry, 
+#For NHB differences are higher.
+#For SHB
+SHB_a_real <- quantile(subset(SHighbushBlueberry, 
                           Number.of.visits == 0)$PollinationValue)[2]
 #We need a in %
-NHB_a <- (NHB_a_real/ NHB_b)*100
-NHB_b <- quantile(subset(NHighbushBlueberry, 
+SHB_b <- quantile(subset(SHighbushBlueberry, 
                      Number.of.visits == 10)$PollinationValue)[4]
+SHB_a <- (SHB_a_real/ SHB_b)*100
+
 #pollinators available
-unique(NHighbushBlueberry$Pollinator)
-NHBmix <- subset(NHighbushBlueberry, Pollinator == "mix")
-NHBhb <- subset(NHighbushBlueberry, Pollinator == "Apis.mellifera")
-NHBbb <- subset(NHighbushBlueberry, Pollinator == "Bombus.terrestris")
+unique(SHighbushBlueberry$Pollinator)
+SHBmix <- subset(SHighbushBlueberry, Pollinator == "mix")
+SHBhb <- subset(SHighbushBlueberry, Pollinator == "Apis.mellifera")
+SHBbb <- subset(SHighbushBlueberry, Pollinator == "Tetragonula.carbonaria")
 
 #calculate different SVD values
-NHB_SVE_mix <- mean(subset(NHBmix, 
+SHB_SVE_mix <- mean(subset(SHBmix, 
                        Number.of.visits == 2)$PollinationValue)/2
-NHB_SVE_hb <- mean(subset(NHBhb, 
+SHB_SVE_hb <- mean(subset(SHBhb, 
                        Number.of.visits == 1)$PollinationValue)
-NHB_SVE_bb <- mean(subset(NHBbb, 
+SHB_SVE_bb <- mean(subset(SHBbb, 
                        Number.of.visits == 1)$PollinationValue)
 
 
 #calculate param c
-NHB_c_mix <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE_mix, to_ = 15)$c_parameter
-NHB_c_hb <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE_hb, to_ = 15)$c_parameter
-NHB_c_bb <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE_bb, to_ = 15)$c_parameter
+SHB_c_mix <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE_mix, to_ = 15)$c_parameter
+SHB_c_hb <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE_hb, to_ = 15)$c_parameter
+SHB_c_bb <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE_bb, to_ = 15)$c_parameter
 #now we can plot all three
-plot(NHighbushBlueberry$PollinationValue ~ jitter(NHighbushBlueberry$Number.of.visits), 
+plot(SHighbushBlueberry$PollinationValue ~ jitter(SHighbushBlueberry$Number.of.visits), 
      las = 1, xlab = "Visits", ylab = "Fruit weigth", type = "n",
-     ylim = c(0,4), xlim = c(0,15))
-plot_visits(NHB_a, NHB_b, NHB_c_mix, to_ = 15, 
+     ylim = c(0,2), xlim = c(0,10))
+plot_visits(SHB_a, SHB_b, SHB_c_mix, to_ = 10, 
             add_ = TRUE, col = "#D55E00")
-plot_visits(NHB_a, NHB_b, NHB_c_hb, to_ = 15, 
+plot_visits(SHB_a, SHB_b, SHB_c_hb, to_ = 10, 
             add_ = TRUE, col = "#E69F00")
-plot_visits(NHB_a, NHB_b, NHB_c_bb, to_ = 15, 
+plot_visits(SHB_a, SHB_b, SHB_c_bb, to_ = 10, 
             add_ = TRUE, col = "darkred")
 ```
 
