@@ -84,6 +84,10 @@ plot_visits(REB_a, REB_b, REB_c, to_ = 15,
 We can also predict how different pollinator communities might affect yield. For this we focus on Northern Highbush blueberry. We compare a mix of pollinators, vs honeybees dominated vs bumblebee dominated communities.
 
 ```{r}
+
+#Note try better for SHB, as it can be nicer for thier pollinators.
+
+
 #For NHB
 NHB_a_real <- quantile(subset(NHighbushBlueberry, 
                           Number.of.visits == 0)$PollinationValue)[2]
