@@ -22,29 +22,29 @@ The formula is split into two main parts: a **fixed baseline** and a **variable 
 
 > `((b * a) / 100)`
 
--   This represents the seeds produced **without any pollinators**.
+- This represents the seeds produced **without any pollinators**.
 
--   $b$: The maximum potential seed set (total capacity).
+- $b$: The maximum potential seed set (total capacity).
 
--   $a$: The percentage of that maximum that can be achieved through self-pollination (e.g., if $a=20$, the plant can fill 20% of its seeds by itself).
+- $a$: The percentage of that maximum that can be achieved through self-pollination (e.g., if $a=20$, the plant can fill 20% of its seeds by itself).
 
 #### The Pollinator Contribution
 
 > `(b - ((b * a) / 100)) * (1 - exp(-c * visitation))`
 
--   This represents the "remaining" seed potential that requires pollinators.
+- This represents the "remaining" seed potential that requires pollinators.
 
--   $(b - \text{Baseline})$: This is the "room for improvement." It ensures that as pollinators arrive, they only fill the seeds that haven't already been self-pollinated.
+- $(b - \text{Baseline})$: This is the "room for improvement." It ensures that as pollinators arrive, they only fill the seeds that haven't already been self-pollinated.
 
--   $(1 - \exp(-c \cdot \text{visitation}))$: This is an **exponential saturation curve**. It starts at 0 and climbs toward 1 as the number of visits increases.
+- $(1 - \exp(-c \cdot \text{visitation}))$: This is an **exponential saturation curve**. It starts at 0 and climbs toward 1 as the number of visits increases.
 
--   $c$: The efficiency parameter. A higher $c$ means the plant reaches its maximum seed set with very few pollinator visits.
+- $c$: The efficiency parameter. A higher $c$ means the plant reaches its maximum seed set with very few pollinator visits.
 
 This model is often used in ecology to show that there is a "diminishing return" on pollinator visits.
 
--   **If Visitation = 0**: The entire second half of the equation becomes 0. You are left only with the baseline: the seeds the plant makes by itself.
+- **If Visitation = 0**: The entire second half of the equation becomes 0. You are left only with the baseline: the seeds the plant makes by itself.
 
--   **As Visitation Increases**: The seed set grows quickly at first, then slows down as it approaches the maximum limit ($b$).
+- **As Visitation Increases**: The seed set grows quickly at first, then slows down as it approaches the maximum limit ($b$).
 
 ## Results
 

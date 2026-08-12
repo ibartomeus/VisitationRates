@@ -2,6 +2,8 @@
 title: "How much visits do we need?"
 format: pdf
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Abstract
@@ -89,6 +91,8 @@ OSR also saturates very quickly...
 bean <- read.csv(file = "data/bean.csv")
 #head(bean)
 #unique(bean$pollinator) #What is OR?
+#bean$beanperpod <- ifelse(bean$beanperpod == 0 & bean$pollinator != "Closed", NA, bean$beanperpod)
+boxplot(bean$beanperpod ~ bean$pollinator, las = 1)
 bean <- subset(bean, pollinator != "Hand")
 #unique(bean$intensity)
 #bean[which(is.na(bean$intensity)),]
@@ -154,14 +158,14 @@ calculate_required_visits(c_val = c_val$c_parameter, b = 10, a = 29, target_perc
 
 ## Caveats:
 
--   We assume optimal conditions of water, light, nutrients, and no other limiting factors. This is why linking seed set to yield is tricky. However, if yield is reduced, while pollination is optimal, we know other factors are limiting for ovule/fruit development
+- We assume optimal conditions of water, light, nutrients, and no other limiting factors. This is why linking seed set to yield is tricky. However, if yield is reduced, while pollination is optimal, we know other factors are limiting for ovule/fruit development
 
--   We work at the flower level. As we model idealized flowers, and extrapolate to thousands of flowers per crop, relying on averages (e.g. pollinator efficiency) is appropiate.
+- We work at the flower level. As we model idealized flowers, and extrapolate to thousands of flowers per crop, relying on averages (e.g. pollinator efficiency) is appropiate.
 
--   We can quickly convert visits per m2 and hour (relevant measure for agronomists) to visits per flower if we know flower density and number of hours flowers are open. e.g.:
+- We can quickly convert visits per m2 and hour (relevant measure for agronomists) to visits per flower if we know flower density and number of hours flowers are open. e.g.:
 
-    ```{r}
-    V_transect_to_flower(V_transect = 50, flw_x_m2 = 400, lifespan = 6)
-    ```
+  ```{r}
+  V_transect_to_flower(V_transect = 50, flw_x_m2 = 400, lifespan = 6)
+  ```
 
--   We can use elasticities to see which params have more influence in the outputs.
+- We can use elasticities to see which params have more influence in the outputs.

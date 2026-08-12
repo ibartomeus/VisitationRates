@@ -89,12 +89,15 @@ loss <- function(a, b, SVD){
 
 #to automatically calculate loss:
 
-calculate_visits <- function(a, b, SVD, to_ = 100, 
+calculate_visits <- function(a, b, SVD, from_ = 0, to_ = 100,
                              plot_ = FALSE, col_ = 2){
   baseline <- (b * a) / 100   # Calculate the baseline (autonomous selfing)
   target_gap <- b - baseline  # Calculate the "Target Gap" pollinators need to fill
   SVD <- SVD - baseline #discounting selfing from the empiricall estimation.
-  calculated_loss <- SVD / target_gap   # Calculate the perfect loss value
+  # Safety check: SVD can not be > 0 or the math breaks
+  if(SVD < 0) {
+    stop("SVD is lower than the selfing; insect contribution will be negative.")
+  }calculated_loss <- SVD / target_gap   # Calculate the perfect loss value
   # Safety check: loss cannot be > 1 or the math breaks
   if(calculated_loss > 1) {
     stop("SVD is higher than the remaining gap; total seed set will exceed 'b'.")
