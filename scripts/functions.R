@@ -97,7 +97,8 @@ calculate_visits <- function(a, b, SVD, from_ = 0, to_ = 100,
   # Safety check: SVD can not be > 0 or the math breaks
   if(SVD < 0) {
     stop("SVD is lower than the selfing; insect contribution will be negative.")
-  }calculated_loss <- SVD / target_gap   # Calculate the perfect loss value
+  }
+  calculated_loss <- SVD / target_gap   # Calculate the perfect loss value
   # Safety check: loss cannot be > 1 or the math breaks
   if(calculated_loss > 1) {
     stop("SVD is higher than the remaining gap; total seed set will exceed 'b'.")

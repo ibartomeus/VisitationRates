@@ -50,6 +50,7 @@ We obtain a nice fit of the fake dataset.
 
 ```{r}
 #try with mikes apple data
+#data in old data folder now!
 apple <- read.csv(file = "data/apple.csv")
 #head(apple)
 #unique(apple$Pollinator) #[1] "Bombus terrestris"    "Apis mellifera"       #"Episyrphus balteatus" "Osmia bicornis"      
