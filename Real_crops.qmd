@@ -2,21 +2,23 @@
 title: "Real crops"
 format: pdf
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Crop selection
 
 We will explore:
 
--   Garratt Apple data
+- Garratt Apple data
 
--   Kendall Blueberry data
+- Kendall Blueberry data
 
--   Chirila Lima Bean data
+- Chirila Lima Bean data
 
--   Kandori Strawberry data
+- Kandori Strawberry data
 
--   (Di Trani Watermelon data)
+- Di Trani Watermelon data
 
 ## Fit nls's
 
@@ -34,6 +36,7 @@ SHighbushBlueberry <- subset(dat, Crop == "Southern.Highbush.Blueberry")
 NHighbushBlueberry <- subset(dat, Crop == "Northern.Highbush.Blueberry")
 Rabbiteye.Blueberry <- subset(dat, Crop == "Rabbiteye.Blueberry")
 Apple <- subset(dat, Crop == "Apple")
+Watermelon <- subset(dat, Crop == "Watermelon")
 ```
 
 ### Apple
@@ -67,7 +70,14 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
-
+#save values to compare with model. let's create a table
+all_data <- data.frame(crop = c("apple"),
+                       a = mf["a"],
+                       b = mf["b"],
+                       c = mf["c"],
+                       OVR = calculate_required_visits(a = mf["a"],
+                                                       b = mf["b"],
+                                                       c_val = mf["c"]))
 ```
 
 Best fit according to AIC is our nls model.
@@ -80,7 +90,6 @@ Best fit according to AIC is our nls model.
 #unique(Strawberry$PollinationMetric)
 #needed?
 Strawberry <- subset(Strawberry, Pollinator %in% c("Apis mellifera", "Andrena.spp", "Ceratina.spp"))
-
 
 #fit models
 model_nls <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "model",
@@ -108,9 +117,18 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = 30, add_ = TRUE, col = "#E69F00")
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
+#save values to compare with model. let's create a table
+sb_data <- data.frame(crop = c("strawberry"),
+                       a = mf["a"],
+                       b = mf["b"],
+                       c = mf["c"],
+                       OVR = calculate_required_visits(a = mf["a"],
+                                                       b = mf["b"],
+                                                       c_val = mf["c"]))
+all_data <- rbind(all_data, sb_data)
 ```
 
-All models perform equally bad...
+All models perform equally bad... but ours is still more realistic.
 
 ## Lima Bean
 
@@ -143,6 +161,14 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
+lb_data <- data.frame(crop = c("lima bean"),
+                      a = mf["a"],
+                      b = mf["b"],
+                      c = mf["c"],
+                      OVR = calculate_required_visits(a = mf["a"],
+                                                      b = mf["b"],
+                                                      c_val = mf["c"]))
+all_data <- rbind(all_data, lb_data)
 ```
 
 All models perform equally bad...
@@ -184,6 +210,14 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(SHighbushBlueberry$Number.of.vi
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
+shbb_data <- data.frame(crop = c("SHighbushBlueberry"),
+                      a = mf["a"],
+                      b = mf["b"],
+                      c = mf["c"],
+                      OVR = calculate_required_visits(a = mf["a"],
+                                                      b = mf["b"],
+                                                      c_val = mf["c"]))
+all_data <- rbind(all_data, shbb_data)
 ```
 
 Quite similar fits again...
@@ -225,9 +259,17 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(NHighbushBlueberry$Number.of.vi
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
+nhbb_data <- data.frame(crop = c("NHighbushBlueberry"),
+                        a = mf["a"],
+                        b = mf["b"],
+                        c = mf["c"],
+                        OVR = calculate_required_visits(a = mf["a"],
+                                                        b = mf["b"],
+                                                        c_val = mf["c"]))
+all_data <- rbind(all_data, nhbb_data)
 ```
 
-Quite similar fits again...
+Nicer?
 
 ### Rabbiteye Blueberry
 
@@ -266,6 +308,225 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(Rabbiteye.Blueberry$Number.of.v
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
+#not adding it here... flat line.
 ```
 
 Quite similar fits again...
+
+## Watermelon
+
+```{r}
+#head(Watermelon)
+#unique(Watermelon$Pollinator) 
+#unique(Watermelon$PollinationMetric) 
+
+#fit models
+model_nls <- fit_data(seedset = Watermelon$PollinationValue, 
+                      visitation = Watermelon$Number.of.visits, simplify = "model", a_start = 75, b_start = 300)
+model_lm <- lm(Watermelon$PollinationValue ~ Watermelon$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = Watermelon)
+
+#Test fit
+AIC_nls <- AIC(model_nls) #1188.206
+AIC_lm <- AIC(model_lm) #1195.297
+AIC_cuadratic <- AIC(model_cuadratic) #1188.724
+
+#Extract R2
+pseudeR2(model_nls, Watermelon$PollinationValue) #0.41
+summary(model_lm)$r.squared #0.36
+summary(model_cuadratic)$r.squared #0.51
+
+#Extract a, b and c values
+mf <- fit_data(seedset = Watermelon$PollinationValue, 
+               visitation = Watermelon$Number.of.visits, simplify = "params", 
+               a_start = 75, b_start = 300)
+
+#Plot
+plot(Watermelon$PollinationValue ~ jitter(Watermelon$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", col = "grey")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(Watermelon$Number.of.visits), 
+            add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+wm_data <- data.frame(crop = c("Watermelon"),
+                        a = mf["a"],
+                        b = mf["b"],
+                        c = mf["c"],
+                        OVR = calculate_required_visits(a = mf["a"],
+                                                        b = mf["b"],
+                                                        c_val = mf["c"]))
+all_data <- rbind(all_data, wm_data)
+
+#save dataset
+write.csv(all_data, "data/parameters_crops.csv")
+```
+
+# Now let's run simulations for this same crops
+
+We use paremetres from the litearture.
+
+```{r}
+#load params
+d <- read.csv("data/VisitationRates_ParameterData.csv")
+head(d)
+
+#param a is in %
+d$a <- (d$Selfing/ d$Ovules)*100
+
+#SV we can take the average
+d$SV <- rowMeans(d[,c("Honeybee", "Bumblebee", 
+                  "Other.wild.bee", "Hoverfly")], na.rm = TRUE)
+
+#WATERMELON
+#Now we can calculate the curve (c):
+params <- calculate_visits(a = d$a[1], b = d$Ovules[1], SVD = d$SV[1], 
+                           plot_ = TRUE, to_ = 30)
+#warning can be dissmissed.
+
+#And visits needed.
+OVR_model <- calculate_required_visits(a = d$a[1], b = d$Ovules[1], c_val = params$c_parameter) 
+
+#this is going to look baaad. The issue is that the literature data indicates efficiencies of ~200 seeds per single visit, while the empirical data suggest ~50. When using  "SVD = 50", the number of visits is 22, much closer to the reality.
+
+#store data along with the other data
+#load data
+all_data <- read.csv("data/parameters_crops.csv")
+all_data$a_model <- NA
+all_data$b_model <- NA
+all_data$c_model <- NA
+all_data$OVR_model <- NA
+#add
+all_data$a_model[6] <- d$a[1]
+all_data$b_model[6] <- d$Ovules[1]
+all_data$c_model[6] <- params$c_parameter
+all_data$OVR_model[6] <- OVR_model
+
+#loop for all? As only 5, I'll do manually
+#highbush blueberry
+#Now we can calculate the curve (c):
+params <- calculate_visits(a = d$a[2], b = d$Ovules[2], SVD = d$SV[2], 
+                           plot_ = TRUE, to_ = 30)
+#warning can be dissmissed.
+#And visits needed.
+OVR_model <- calculate_required_visits(a = d$a[2], b = d$Ovules[2], c_val = params$c_parameter) 
+#store data along with the other data
+all_data$a_model[5] <- d$a[2]
+all_data$b_model[5] <- d$Ovules[2]
+all_data$c_model[5] <- params$c_parameter
+all_data$OVR_model[5] <- OVR_model
+
+#apple
+#Now we can calculate the curve (c):
+params <- calculate_visits(a = d$a[3], b = d$Ovules[3], SVD = d$SV[3], 
+                           plot_ = TRUE, to_ = 30)
+#warning can be dissmissed.
+#And visits needed.
+OVR_model <- calculate_required_visits(a = d$a[3], b = d$Ovules[3], c_val = params$c_parameter) 
+#store data along with the other data
+all_data$a_model[1] <- d$a[3]
+all_data$b_model[1] <- d$Ovules[3]
+all_data$c_model[1] <- params$c_parameter
+all_data$OVR_model[1] <- OVR_model
+
+#strawberry
+#Now we can calculate the curve (c):
+params <- calculate_visits(a = d$a[5], b = d$Ovules[5], SVD = d$SV[5], 
+                           plot_ = TRUE, to_ = 30)
+#warning can be dissmissed.
+#And visits needed.
+OVR_model <- calculate_required_visits(a = d$a[5], b = d$Ovules[5], c_val = params$c_parameter) 
+#store data along with the other data
+all_data$a_model[2] <- d$a[5]
+all_data$b_model[2] <- d$Ovules[5]
+all_data$c_model[2] <- params$c_parameter
+all_data$OVR_model[2] <- OVR_model
+
+#lima bean
+#Now we can calculate the curve (c):
+params <- calculate_visits(a = d$a[6], b = d$Ovules[6], SVD = d$SV[6], 
+                           plot_ = TRUE, to_ = 30)
+#warning can be dissmissed.
+#And visits needed.
+OVR_model <- calculate_required_visits(a = d$a[6], b = d$Ovules[6], c_val = params$c_parameter) 
+#store data along with the other data
+all_data$a_model[3] <- d$a[6]
+all_data$b_model[3] <- d$Ovules[6]
+all_data$c_model[3] <- params$c_parameter
+all_data$OVR_model[3] <- OVR_model
+
+#plot 1:1 plot
+all_data <- all_data[-4,]
+plot(all_data$OVR, all_data$OVR_model, ylim = c(0,100), xlim = c(0,100), 
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+#Not too satisfactory... specially strawberry, but also watermelon and lima bean
+plot(all_data$a, all_data$a_model, ylim = c(0,50), xlim = c(0,50),
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+
+plot(all_data$b, all_data$b_model, ylim = c(0,450), xlim = c(0,450),
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+
+plot(all_data$c, all_data$c_model, ylim = c(0,4), xlim = c(0,4),
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+```
+
+# Finally let's run it for all crops
+
+```{r}
+#re-read data
+dat <- read.csv("data/VisitationRates_ParameterData.csv")
+head(dat)
+dat <- dat[-24,] #removing cheak peas, which is wierd as a = b = SV
+
+#param a is in %
+dat$a <- (dat$a / dat$b)*100
+
+#SV we can take the average
+dat$SV <- rowMeans(dat[,c("Honeybee", "Bumblebee", 
+                      "Other.wild.bee", "Hoverfly", "Other")], na.rm = TRUE)
+dat$SV[which(dat$Crop == "cherry")] <- 0.25 #Using only wild bees.
+dat$SV[which(dat$Crop == "strawberry")] <- 150 #Using max efficiency...
+
+#output data frame
+out <- data.frame(crop = rep(NA,nrow(dat)), 
+                  family = rep(NA,nrow(dat)),
+                  a = rep(NA,nrow(dat)), 
+                  b = rep(NA,nrow(dat)), 
+                  c = rep(NA,nrow(dat)), 
+                  SVE = rep(NA,nrow(dat)), 
+                  OVR = rep(NA,nrow(dat)))
+#loop it
+for(i in 1:nrow(dat)){
+  #extract c
+  params <- calculate_visits(a = dat$a[i], b = dat$b[i], SVD = dat$SV[i], 
+                             plot_ = FALSE)
+  #warning can be dissmissed.
+  #And visits needed.
+  OVR_model <- calculate_required_visits(a = dat$a[i], b = dat$b[i], c_val = params$c_parameter) 
+  #store the data
+  out$crop[i] <- dat$Crop[i]
+  out$family[i] <- dat$family[i]
+  out$a[i] <- dat$a[i]
+  out$b[i] <- dat$b[i]
+  out$c[i] <- params$c_parameter
+  out$SVE[i] <- dat$SV[i]
+  out$OVR[i] <- OVR_model
+}
+
+bymedian <- with(out, reorder(family, -OVR, median))
+boxplot(out$OVR ~ bymedian, las = 2, xlab = "")
+bymedian <- with(out, reorder(crop, -OVR, median))
+boxplot(out$OVR ~ bymedian, las = 2, xlab = "")
+
+#parameter influence?
+scatter.smooth(out$OVR ~ out$a, las = 1)
+scatter.smooth(out$OVR ~ out$b, las = 1)
+scatter.smooth(out$OVR ~ out$c, las = 1)
+scatter.smooth(out$OVR ~ out$SVE, las = 1)
+#It's a combination, but c is equivalent to OVR 
+
+```
