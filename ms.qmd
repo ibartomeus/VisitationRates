@@ -2,60 +2,394 @@
 title: "Predictions of optimal visitation rates for crops using simple mechanistic models"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Abstract
 
+While the positive effect of pollinators on crop production has been clearly demonstrated, crop level predictions of how pollination rates increase crops reproductive success remains elusive and requires time consuming experiments. Defining the functional form of this relationships is of pivotal importance to understand when pollination is limiting, and to develop operational visitation rate values that can be used by practitioners to rapidly assess pollination levels. Given the large variety of crops, and varieties, running this experiments for all of them is unlikely to be achieved. Here we propose and test a generalized model based on biological first principles to infer optimal pollinator visitation rates for multiple crops. First we show that a non-inflicted functional form fits well empirical data. Second, we develop an test a flexible model to produce this functional forms from easy to obtain plant and pollinator traits such as selfing rates, ovule number, and single visit efficiency. Finally, we apply our framework to 26 crops and ilustrate its flexibility using blueberries as a case study to show the advantages and limitations of the framework. An R package is provided to facilitate the uptake of this modelling framework by practitioners.
+
 ## Introduction
+
+Traditional agronomical research have pioneered the quantification of inputs and outputs for optimizing crop production. For example, controle trials have provided clear guidelines on optimal fertilizer use, irrigation, or pesticide application (ref?). However, insect pollination remained hard to measure, and was often assume to be non limiting, or complemented by stocking managed pollinators *ad libitum* (Garibaldi et al 2020). In the last 20 years, the importance of both managed and wild pollinators has been made evident, mainly trough synthesis papers showing a positive relationship between pollinator visitation and crop production (Garibaldi et al. 2013, Rader et al. 2016, Reilly et al. 2025). Despite this general consensus, the intrinsic variability across crops and varieties (Reilly et al. 2025), the assumption of linear relationships (Eeaerts et al. 2026), and the confounding factors affecting yield (Deguines et al. 2010) prevents from suggesting optimal visitation rates (Garibaldi et al 2020).
+
+Crop yield is affected by many factors, including fertilizer, water availability, or cropping density, and hence observational studies risk confounding the effects of pollination on crops when pollinator availability is correlated with any of this factors (Chabert et al. 2026). Moreover, most analysis make statistical simplifications such as assuming a linear relationship, despite it has been shown that non linear, quadratic, relationship often fits better the data (Eeaerts et al. 2026). The consequences is that even simple metrics such as how many visits per flower are needed to ensure pollination is not limiting are hard to extract from this types of analysis, even when crops are disagregated. As an alternative, controled experiments, where crop resources are kept constant, and the number of visits per flower are tracked can provide detailed information on how many visits by different pollinators (Refs Garratt, etc...). However, this experiments are terribly time consuming, and hence have only been done for a handfull of crops (refs). Even within those crops, sriking differences are observed depending of the cultivar, environmetal conditions, and pollinator community, suggesting that experiments are not generalizable.
+
+Here, we propose a well known functional form relating pollinator visitation to crop production: the non-inflicted curve proposed by Morris et al. 2004. The advantage of this functional form over statistical quadratic fits is that its parameters have biological meaning. The curve is defined by three parameters which govern the relationship between pollinator visitation rates and crop seed set. Parameter (a) sets the y-intercept (i.e., seed set for unvisited flowers), parameter (b) sets the asymptote (i.e., maximum seed set attainable by a single flower), and parameter (c) governs the rate of approach to the asymptote. All this paremeters can be estimated from experimental data, but also derived from first principles. For example, existing databases on selfing rates can inform about the expected intercept (Kleijn et al 2007, Siopa et al 20XX). Similarly, number of fertile ovules can be obtained from botanic manuals. Finally, the rate of approach can be derived from the pollinator efficiency in a per visit unit (ref).
+
+A clear framework on how to assess pollinators contribution to yeild will facilitate gastronomical pollinator assessment and management. Here we provide functions to fit experimental data when availble, and generalized mechanistic options to assess any given crop rapidly. To facilitate uptake, and R package is accompagning this article along case studies showing its flexibiity and limitations.
 
 ## Methods
 
-This R formula describes a **seed set model** that accounts for two different ways a plant can produce seeds: through **autonomous self-pollination** (selfing) and through **pollinator-assisted fertilization** (outcrossing).
+#### Modelling framework.
 
-In mathematical notation, the equation looks like this:
+We use a functional form that describes a **seed set model** that accounts for two different ways a plant can produce seeds: through **autonomous self-pollination** (selfing) and through **pollinator-assisted fertilization** (outcrossing). In mathematical notation, the equation looks like this:
 
-\$\$Seedset = \\left( \\frac{b \\cdot a}{100} \\right) + \\left( b - \\frac{b \\cdot a}{100} \\right) \\cdot (1 - e\^{-c \\cdot visitation})\$\$
+`((b*a)/100) + (b-((b*a)/100)) * (1-exp(-c*visits))`
 
-The formula is split into two main parts: a **fixed baseline** and a **variable growth curve**.
+The formula is split into two main parts: a **fixed baseline** and a **variable growth curve**. The baseline (i.e. the intercept, representing autonomous seed set production) is defined by $b$ , the maximum potential seed set, and $a$, the percentage of that maximum that can be achieved through self-pollination (e.g., if $a=20$, the plant can produce 20% of its seeds by itself). The pollinator contribution (variable growth curve) represents the "remaining" seed potential that requires pollinators. Here, *c* goberns the **exponential saturation curve**. It starts at *a* and climbs toward b as the number of visits increases. A higher $c$ means the plant reaches its maximum seed set with very few pollinator visits. This model show that there is a "diminishing return" on pollinator visits. Note that If `visits` = 0, the entire second half of the equation becomes 0 and only with the baseline counts. As `visits` increases, the seed set grows quickly at first, then slows down as it approaches the maximum limit ($b$).
 
-#### The Baseline (Autonomous Seed Set)
+Optimal visitation rate (OVR) can be calculated as the visits required to achieve 95% (or any other chosen threshold) of potential seed set.
 
-> `((b * a) / 100)`
+#### Data
 
-- This represents the seeds produced **without any pollinators**.
+We collected from the literature data on five studies measuring seed set as a function of number of visits. This five studies cover different crop types (apple, strawberry, highbush blueberry, watermelon and lima beab). On this data we compare three models and compare them by AIC and R2. We compare a linear relationship, a quadratic relationship and our model described above. Models were run using lm() and nls() functions in basic R.
 
-- $b$: The maximum potential seed set (total capacity).
+#### Generalized formula.
 
-- $a$: The percentage of that maximum that can be achieved through self-pollination (e.g., if $a=20$, the plant can fill 20% of its seeds by itself).
+As this data is rare in the literature, we derive a generalized version of our modelling framwork that rely on first principles and does not require hard won data. To that end, we set `b` as the maximum seed set a flower can attain. This can be extracted from the crop basic biology, as it will match the ovule production, a parameter often easy to obtain from the literature or to simply obtain an average by counting ovules/seeds in the field. Parameter `a` , given in % of seedset without pollinators, can be approximated knowing plants selfing rates. That is, who many seeds the flower produce under no pollination. This information is available in the literature (e.g. Klein et al. 2007, Siopa et al 20XX) or can be calculated with basic low-effort experiments for your target cultivar. The trickier parameter to calculate is c. For this, we rely on pollinator per visit efficiency. Many studies measure seed set after a single visit. This values can be used to extrapolate how many visits a flower requires until fertilizing all its ovules. The average pollinator efficiency can be calculated across pollinators, which is the representative metric, or calculated by insect group. This data is already collected for many crops, (and is expected to vary less among crops and pollinators according to Vazquez et al. 2005 and Kleijn et al 2015) and can be collected in the field if necessary with a moderate effort. After this first visit, it is known that each subsequent visit is less efficient (Kendall et al. 20XX), hence we can penalize each consecutive visit by a diminishing returns function. This penalization can be informed biologically, as we expect this diminishing returns should approach `b`.
 
-#### The Pollinator Contribution
+To test the flexibility of this approach, we first compiled information on a, b and SV parameters for 26 major crops by scanning the literature. Note that those are informative generic values, but we encourage users to look up for values for their crop variety, an region. Next, we visually compare this data for the five crops for which we have detailed data.
 
-> `(b - ((b * a) / 100)) * (1 - exp(-c * visitation))`
+Finally, we delve into the flexibility of the approach in a case study on blueberry pollination (Kendall et al. 20XX). This allow us to show how to customize the values for different cultivars or pollinator communities.
 
-- This represents the "remaining" seed potential that requires pollinators.
+```{r}
+c <- calculate_visits(a = 20, b = 100, SVD = 40, to_ = 15, 
+                 plot_ = TRUE, col_ = 2)
+ovr <- calculate_required_visits(a = 20, b = 100, c = c$c_parameter)
+abline(h = 100, lty = 2, col = "brown")
+abline(v = ovr, lty = 2, col = "blue")
+points(x = 1, y = 40, pch = 19)
+text(x = 3.5, y = 20, "a = selfing rate", col = "darkgrey")
+text(x = 7, y = 40, "SVE = single visit efficiency")
+text(x = 9, y = 58, "c = diminishing returns param.", col = "red")
+text(x = 4, y = 95, "b = maximum seed set", col = "brown")
+text(x = 11.5, y = 80, "OVR = optimal visits", col = "blue")
+```
 
-- $(b - \text{Baseline})$: This is the "room for improvement." It ensures that as pollinators arrive, they only fill the seeds that haven't already been self-pollinated.
-
-- $(1 - \exp(-c \cdot \text{visitation}))$: This is an **exponential saturation curve**. It starts at 0 and climbs toward 1 as the number of visits increases.
-
-- $c$: The efficiency parameter. A higher $c$ means the plant reaches its maximum seed set with very few pollinator visits.
-
-This model is often used in ecology to show that there is a "diminishing return" on pollinator visits.
-
-- **If Visitation = 0**: The entire second half of the equation becomes 0. You are left only with the baseline: the seeds the plant makes by itself.
-
-- **As Visitation Increases**: The seed set grows quickly at first, then slows down as it approaches the maximum limit ($b$).
+Fig 1: Theoretical explanation of the modelling framework. The plot shows a, b, and c parameters, and how they can be estimated from single visit data.
 
 ## Results
 
-Scheme:
+The non-inflicted \[IB; we need a better name\] functional form show a better or equal performance than the quadratic or linear fit for all five crops (figure 2), demonstrating that is a useful modelling framework. Most importantly, when visually inspecting the fitted lines, our model avoid the unrealistic linear increase of seed set beyond maximum number of ovules (b), and the reduction of seed set at high visitation rate shown by some hump-shape quadratic fits. Note that despite this reduction has been shown in some crops (Saez), the mechanisms are often different (e.g. stigma damage) and can be better assessed by visitation rates that well beyond optimal.
 
-Fig 1: Theoretical explanation of the modelling framework. A plot showing a, b, c, and how they can be estimated, including the SVE trick.
+```{r}
+#| echo: false
+#| warning: false
 
-Fig2: Prove that the theoretical model is a good fit to the data, using \~ 5 crops, we can show that our model fits better (or equal) the data than a linear or cuadratic model. See Real_crops.qmd for analysis.
+#Source functions. Should be made into a package.
+source(file = "scripts/functions.R")
 
-Fig 3: A test of how our model behaves agaisnt real data. Using the same \~5 crops, we can compare empirially derived a, b, c and optimal visitation rate (OVR) parameters, with a, b and c and OVR predictions in a scatter plot with the 1:1 line plotted. I expect despite over predicting b, OVR will be fair.
+#read observational data
+dat <- read.csv("data/VisitationRates_Data.csv")
+#make a dataset per crop
+#unique(dat$Crop)
+LimaBean <- subset(dat, Crop == "Lima.bean")
+Strawberry <- subset(dat, Crop == "Strawberry") 
+SHighbushBlueberry <- subset(dat, Crop == "Southern.Highbush.Blueberry")  
+NHighbushBlueberry <- subset(dat, Crop == "Northern.Highbush.Blueberry")
+Rabbiteye.Blueberry <- subset(dat, Crop == "Rabbiteye.Blueberry")
+Apple <- subset(dat, Crop == "Apple")
+Watermelon <- subset(dat, Crop == "Watermelon")
+```
 
-Fig 4: Description of our model predictions for all EU crops (or as much as possible). We can plot OVR as a function of a, b and SVE params as a measure of sensitivity analysis. Maybe a boxplot of OVR per crop family would be nice too.
+```{r}
+#AIC and R2 in Real_crops.qmd
 
-Fig5: Case study on how to go from generic predictions to tailored predictions for your crop. Using Blueberry data, we show can we can fit different varieties, and different pollinator communities. See Fig5.qmd for an advance plot on this.
+#apple
+#fit models
+model_nls <- fit_data(seedset = Apple$PollinationValue, visitation = Apple$Number.of.visits, simplify = "model")
+model_lm <- lm(Apple$PollinationValue ~ Apple$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = Apple)
+
+#Extract a, b and c values
+mf <- fit_data(seedset = Apple$PollinationValue, visitation = Apple$Number.of.visits, simplify = "params")
+
+#Plot
+par(mfrow=c(2,3))
+plot(Apple$PollinationValue ~ jitter(Apple$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", main = "Apple")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add = TRUE, col = "#009E73")
+
+#Strawberry
+Strawberry <- subset(Strawberry, Pollinator %in% c("Apis mellifera", "Andrena.spp", "Ceratina.spp"))
+
+#fit models
+model_nls <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "model",
+                      a_start = 10, b_start = 100, c_start = 0.5)
+model_lm <- lm(Strawberry$PollinationValue ~ Strawberry$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = Strawberry)
+
+#Extract a, b and c values
+mf <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "params", a_start = 10, b_start = 100, c_start = 0.5)
+
+#Plot
+plot(Strawberry$PollinationValue ~ jitter(Strawberry$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", xlim = c(0,30), , main = "Strawberry")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = 30, add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
+      add = TRUE, col = "#009E73")
+
+#Lime Bean
+#fit models
+model_nls <- fit_data(seedset = LimaBean$PollinationValue, visitation = LimaBean$Number.of.visits, simplify = "model")
+model_lm <- lm(LimaBean$PollinationValue ~ LimaBean$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = LimaBean)
+
+#Extract a, b and c values
+mf <- fit_data(seedset = LimaBean$PollinationValue, visitation = LimaBean$Number.of.visits, simplify = "params")
+
+#Plot
+plot(LimaBean$PollinationValue ~ jitter(LimaBean$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", main = "Lime Bean")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add = TRUE, col = "#009E73")
+
+#Blueberry
+NHighbushBlueberry <- subset(NHighbushBlueberry, PollinationMetric == "Fruit.weight")
+
+#fit models
+model_nls <- fit_data(seedset = NHighbushBlueberry$PollinationValue, 
+                      visitation = NHighbushBlueberry$Number.of.visits, simplify = "model")
+model_lm <- lm(NHighbushBlueberry$PollinationValue ~ NHighbushBlueberry$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = NHighbushBlueberry)
+
+#Extract a, b and c values
+mf <- fit_data(seedset = NHighbushBlueberry$PollinationValue, 
+               visitation = NHighbushBlueberry$Number.of.visits, simplify = "params")
+
+#Plot
+plot(NHighbushBlueberry$PollinationValue ~ jitter(NHighbushBlueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", col = "grey", main = "Blueberry")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(NHighbushBlueberry$Number.of.visits), 
+            add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add = TRUE, col = "#009E73")
+
+#Watermelon
+#fit models
+model_nls <- fit_data(seedset = Watermelon$PollinationValue, 
+                      visitation = Watermelon$Number.of.visits, simplify = "model", a_start = 75, b_start = 300)
+model_lm <- lm(Watermelon$PollinationValue ~ Watermelon$Number.of.visits)
+model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = Watermelon)
+
+#Extract a, b and c values
+mf <- fit_data(seedset = Watermelon$PollinationValue, 
+               visitation = Watermelon$Number.of.visits, simplify = "params", 
+               a_start = 75, b_start = 300)
+
+#Plot
+plot(Watermelon$PollinationValue ~ jitter(Watermelon$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", main = "Watermelon")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(Watermelon$Number.of.visits), 
+            add_ = TRUE, col = "#E69F00")
+abline(model_lm, col = "#56B4E9")
+curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add = TRUE, col = "#009E73")
+#Add legend with colors.
+par(mfrow=c(1,1))
+
+```
+
+Fig 2: Seed set as a function of visitation rate for data collected on five different crops. a) apple, b) strawberry, c) highbush blueberry, d) watermelon, e) lima bean. Blue lines repsent the linear fit, green lines the quadratic fits and orange lines the non-inflicted fucntional form. AIC and R2 are in table S1?
+
+Using the generalized modelling approach, we calculated optimal visitation rates for 26 crops (fig 3). Of those the five crops for which we can visually compare the model parameters show a good agreement between data-driven values and mechanistic values. Note that for example, watermelon seems to require less visits under the mechanistic model (fig 4). This is because single visit values in the literature (Ref used, but also see REF), are much higher than for the data used to fit the model (\~200 seeds per visit vs \~50 seeds per visit). When using the 50 seeds per visit value the discrepancy is reduced. This indicates the importance of choosing the initial parameters well.
+
+```{r}
+#read data
+dat <- read.csv("data/VisitationRates_ParameterData.csv")
+#head(dat)
+dat <- dat[-24,] #removing cheak peas, which is wierd as a = b = SV
+
+#param a is in %
+dat$a <- (dat$a / dat$b)*100
+
+#SV we can take the average
+dat$SV <- rowMeans(dat[,c("Honeybee", "Bumblebee", 
+                          "Other.wild.bee", "Hoverfly", "Other")], na.rm = TRUE)
+#But some are wierd
+dat$SV[which(dat$Crop == "cherry")] <- 0.25 #Using only wild bees.
+dat$SV[which(dat$Crop == "strawberry")] <- 150 #Using max efficiency...
+
+#output data frame
+out <- data.frame(crop = rep(NA,nrow(dat)), 
+                  family = rep(NA,nrow(dat)),
+                  a = rep(NA,nrow(dat)), 
+                  b = rep(NA,nrow(dat)), 
+                  c = rep(NA,nrow(dat)), 
+                  SVE = rep(NA,nrow(dat)), 
+                  OVR = rep(NA,nrow(dat)))
+#loop it
+for(i in 1:nrow(dat)){
+  #extract c
+  params <- calculate_visits(a = dat$a[i], b = dat$b[i], SVD = dat$SV[i], 
+                             plot_ = FALSE)
+  #warning can be dissmissed.
+  #And visits needed.
+  OVR_model <- calculate_required_visits(a = dat$a[i], b = dat$b[i], c_val = params$c_parameter) 
+  #store the data
+  out$crop[i] <- dat$Crop[i]
+  out$family[i] <- dat$family[i]
+  out$a[i] <- dat$a[i]
+  out$b[i] <- dat$b[i]
+  out$c[i] <- params$c_parameter
+  out$SVE[i] <- dat$SV[i]
+  out$OVR[i] <- OVR_model
+}
+
+par(mfrow=c(1,2), mar=c(8, 4, 1.5, 0.5))
+bymedian <- with(out, reorder(family, -OVR, median))
+boxplot(out$OVR ~ bymedian, las = 2, xlab = "", ylab = "OVR")
+bymedian <- with(out, reorder(crop, -OVR, median))
+boxplot(out$OVR ~ bymedian, las = 2, xlab = "", ylab = "OVR")
+par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
+
+#parameter influence? To SUp Mat?
+#scatter.smooth(out$OVR ~ out$a, las = 1)
+#scatter.smooth(out$OVR ~ out$c, las = 1)
+#scatter.smooth(out$OVR ~ out$SVE, las = 1)
+#It's a combination, but c is equivalent to OVR 
+```
+
+Fig 3: Description of our model predictions for main EU crops. When plotting OVR as a function of a, b and SVE parameters, we see how it emerges from a combination of those, and is not strongly influenced by any single parameter.
+
+```{r}
+#load params
+all_data <- read.csv("data/parameters_real_crops.csv")
+#head(all_data)
+
+par(mfrow=c(2,2))
+plot(all_data$OVR, all_data$OVR_model, ylim = c(0,100), xlim = c(0,100), xlab = "Obs_OVR", ylab = "Model_OVR", 
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+#Not too satisfactory... specially strawberry, but also watermelon and lima bean
+plot(all_data$a, all_data$a_model, ylim = c(0,50), xlim = c(0,50),  xlab = "Obs_a", ylab = "Model_a",
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+
+plot(all_data$b, all_data$b_model, ylim = c(0,450), xlim = c(0,450), xlab = "Obs_b", ylab = "Model_b",
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+
+plot(all_data$c, all_data$c_model, ylim = c(0,4), xlim = c(0,4),
+     , xlab = "Obs_c", ylab = "Model_c",
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+par(mfrow=c(1,1))
+```
+
+Fig4: Correlation correlation for the four main parameters (a,b,c, OVR) for data driven and mechanistic models. Using the same five crops, we compare empirically derived a, b, c and optimal visitation rate (OVR) parameters, with a, b and c and OVR predictions in a scatter plot with the 1:1 line plotted.
+
+We showed that with basic data, we can generate plausible functional forms for many crops, and estimate their expected optimal visitation rates. However, as expectedm those are at quite coarse resolution. Our framework allow refining this predictions if the right data is available. Using detailed data collected by Kendall et al. 2024 in blueberry we first predict the relationship between visitation and fruit weight for different varieties (fig 5a), and second for different pollinator communities (fig 5b). Note that in blueberry, fruight weight and seed set are highly correlated (REF), and allow us to use it under this same framework, but for most crops fruight weigth might be decoupled from seed set. We see that detailed information on selfing rates and maximum yield attaiable change the predictions for the different varieties. Similarly, different pollinator communities might affect yield. In Southern Highbush blueberry we compare a mix of pollinators, vs honeybees dominated vs *Tetragonula carbonaria* dominated communities.
+
+```{r}
+#read data
+dat <- read.csv("data/VisitationRates_Data.csv")
+#make a dataset per crop
+SHighbushBlueberry <- subset(dat, Crop == "Southern.Highbush.Blueberry")  
+SHighbushBlueberry <- subset(SHighbushBlueberry, PollinationMetric == "Fruit.weight")
+NHighbushBlueberry <- subset(dat, Crop == "Northern.Highbush.Blueberry")
+NHighbushBlueberry <- subset(NHighbushBlueberry, PollinationMetric == "Fruit.weight")
+Rabbiteye.Blueberry <- subset(dat, Crop == "Rabbiteye.Blueberry")
+Rabbiteye.Blueberry <- subset(Rabbiteye.Blueberry, PollinationMetric == "Fruit.weight")
+
+#We can use quantiles, but mean of 0 and and max visits, or simply min and max, might also work.
+
+#For SHB
+SHB_a_real <- quantile(subset(SHighbushBlueberry, 
+                              Number.of.visits == 0)$PollinationValue)[2]
+SHB_b <- quantile(subset(SHighbushBlueberry, 
+                         Number.of.visits == 15)$PollinationValue)[4]
+SHB_SVE <- mean(subset(SHighbushBlueberry, 
+                       Number.of.visits == 1)$PollinationValue)
+#We need a in %
+SHB_a <- (SHB_a_real/ SHB_b)*100
+
+#For NHB
+NHB_a_real <- quantile(subset(NHighbushBlueberry, 
+                              Number.of.visits == 0)$PollinationValue)[2]
+NHB_b <- quantile(subset(NHighbushBlueberry, 
+                         Number.of.visits == 10)$PollinationValue)[4]
+NHB_SVE <- mean(subset(NHighbushBlueberry, 
+                       Number.of.visits == 1)$PollinationValue)
+#We need a in %
+NHB_a <- (NHB_a_real/ NHB_b)*100
+
+#For REB
+REB_a_real <- quantile(subset(Rabbiteye.Blueberry, 
+                              Number.of.visits == 0)$PollinationValue)[2]
+REB_b <- quantile(subset(Rabbiteye.Blueberry, 
+                         Number.of.visits == 15)$PollinationValue)[4]
+REB_SVE <- mean(subset(Rabbiteye.Blueberry, 
+                       Number.of.visits == 1)$PollinationValue)
+#We need a in %
+REB_a <- (REB_a_real/ REB_b)*100
+
+#calculate param c
+SHB_c <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE, to_ = 15)$c_parameter
+NHB_c <- calculate_visits(a = NHB_a, b = NHB_b, SVD = NHB_SVE, to_ = 15)$c_parameter
+REB_c <- calculate_visits(a = REB_a, b = REB_b, SVD = REB_SVE, to_ = 15)$c_parameter
+
+#now we can plot all three
+par(mfrow=c(1,2))
+plot(SHighbushBlueberry$PollinationValue ~ jitter(SHighbushBlueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", type = "n", main = "Different varieties",
+     ylim = c(0,4), xlim = c(0,15))
+plot_visits(SHB_a, SHB_b, SHB_c, to_ = 15, 
+            add_ = TRUE, col = "#223366")
+plot_visits(NHB_a, NHB_b, NHB_c, to_ = 15, 
+            add_ = TRUE, col = "#A3B18A")
+plot_visits(REB_a, REB_b, REB_c, to_ = 15, 
+            add_ = TRUE, col = "#B9D1EA")
+
+#Now different pollinator compositions.
+#For SHB
+SHB_a_real <- quantile(subset(SHighbushBlueberry, 
+                              Number.of.visits == 0)$PollinationValue)[2]
+#We need a in %
+SHB_b <- quantile(subset(SHighbushBlueberry, 
+                         Number.of.visits == 10)$PollinationValue)[4]
+SHB_a <- (SHB_a_real/ SHB_b)*100
+
+#pollinators available
+unique(SHighbushBlueberry$Pollinator)
+SHBmix <- subset(SHighbushBlueberry, Pollinator == "mix")
+SHBhb <- subset(SHighbushBlueberry, Pollinator == "Apis.mellifera")
+SHBbb <- subset(SHighbushBlueberry, Pollinator == "Tetragonula.carbonaria")
+
+#calculate different SVD values
+SHB_SVE_mix <- mean(subset(SHBmix, 
+                           Number.of.visits == 2)$PollinationValue)/2
+SHB_SVE_hb <- mean(subset(SHBhb, 
+                          Number.of.visits == 1)$PollinationValue)
+SHB_SVE_bb <- mean(subset(SHBbb, 
+                          Number.of.visits == 1)$PollinationValue)
+
+
+#calculate param c
+SHB_c_mix <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE_mix, to_ = 15)$c_parameter
+SHB_c_hb <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE_hb, to_ = 15)$c_parameter
+SHB_c_bb <- calculate_visits(a = SHB_a, b = SHB_b, SVD = SHB_SVE_bb, to_ = 15)$c_parameter
+#now we can plot all three
+plot(SHighbushBlueberry$PollinationValue ~ jitter(SHighbushBlueberry$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", type = "n", main = "Pollinator composition",
+     ylim = c(0,2), xlim = c(0,10))
+plot_visits(SHB_a, SHB_b, SHB_c_mix, to_ = 10, 
+            add_ = TRUE, col = "#D55E00")
+plot_visits(SHB_a, SHB_b, SHB_c_hb, to_ = 10, 
+            add_ = TRUE, col = "#E69F00")
+plot_visits(SHB_a, SHB_b, SHB_c_bb, to_ = 10, 
+            add_ = TRUE, col = "darkred")
+
+par(mfrow=c(1,1))
+```
+
+Fig5: Case study on how to go from generic predictions to tailored predictions for your crop. Using Blueberry data, we show A) that we can fit different varieties, and B) different pollinator communities.
+
+## Discussion
+
+We show how modelling the relationship between insect crop flower visitation rates and seed production is not only possible, but efficient and salable. By developing a simple mechanistic model based on ecological first principles, we presented generic optimal pollinator values for 26 common crops, and show how this values can be fine tuned to speciphic contexts. This is specially important given the high variability expected for this relationships depending on the cultivar of interest, and the available pollinator community.
+
+A core assumption of of our modelling framework is that only pollinator mediate effects are modelled. Rather than a limitation, we see this as a feature of the model, given it is interpreted correctly. When assessing pollinator limitation (ref?), our mechanistic model do not confound pollinator effects with confounding variables such as agricultural intensification (Eeaerts et al. In prep). Hence, observational data and model outputs can be compared to know if something else is limiting yield besides pollinator levels. Similarly, when making recommendations of optimal pollinator levels (Garibaldi et al 2020), we assume those are independent of other management practices. Note that when fitting visitation - seed set curves from observational data directly, confounding factors can still apply. In fact, this is preciely why linking seed set to yield has been elusive so far, and even well researched crops lack a clear guideline on which are optimal pollinator levels.
+
+Despite the clear framework we can provide, the choice of the input parametrs is still not trivial. Ideally, selfing rates, maximum attainable seed set and pollintor efficiency should be collected for your coultivar of interest and context. When this is not possible, informed choices can provide good proxies, but given the large variability in some crops species among cultivars, caution is neede when selecting those parameters. As an example, we found that our model and data fit well watermelon optimal pollinator rates when using Di Trani et al 2024 dataset, but when using available single visit efficiency data from other studies (REFS), the recommended optimal pollinator visits shrinked from \~20 to \~5. This is not a bug of the model, as a value of \~5 visits is sufficient for those other contexts. Hence, the values provided for the 26 crops analyzed are generic values for this kind of crops, but we expect to vary substantially acorss cultivars and pollinator communities within crops. In fact, our case study using blueberry data confirms how fine tunning the input parameters to speciphic contexts can change the outputs in meaningfull ways.
+
+While we focus on the pathway between visitation rate per flower and seed set per fruit, we think expanding the framework to cover the full cycle from pollinator abundance to yield is easily achivable. Most ecological datasets (Allen-Perkins et al 2024) measure pollinator activity as visits per meter and hour rather than in vistis per flower. This is because the most common method is walking a fixed length transect during a fixed time while annotating insects interacting with the plants flowers. Knowing the expected flowers per suqre meter for your field, flower longevity, and using simple conversion rates, we can easily convert visits per m2 and hour to visits per flower (implemented in our R package as `V_transect_to_flower(V_transect = 50, flw_x_m2 = 400, lifespan = 6).`
+
+Similarly, while we work at the flower level, we should think on this flower as an average flower. Visitation rates of less then one visit per flower are hence relevant, as those imply not all flowers will get at least one visit, as can be the case in pollinator depauperate areas (ref?). Hence, to turn our seed set per flower into yield, we would (simply) need to know the relationship between seed set and fruit weight. This can be, again, obtained from the literature, or calculated empirically using a few selected fruits covering a large range of weights for which we also count seeds. If desired, this relationship can be truncated to account for abortions if the data suggest fruits with less than x seeds tend to abort. Then, calculating yield implies: `Yield = Flowers/Ha * Visits/Flowers * SeedSet/Visits * FruitWeight/SeedSet = Weight/Ha.`Of course, the more parameters we estimate, the most uncertain is the final value obtained, and proper error propagation is meeded (i.e. accounting for the error or variability in all parameter inputs).\
+\
+While we still lack high quality data on the input parameters for most cultivars, we hope that having a unified framework will spee up the collection of this data, and its addition to unified databases (e.g. CropPol, ...). In this paper we provide the first crude estimates of how many visits per flower we expect different crops to need to ensure pollen is not limiting. This value is critical for starting to measure pollination at the same level that other agricultural inputs such as fertilization or pesticides, and improve management beyond actual guesstimates (Garibaldi et al. 2020; ref)s. For example, visitation rates well below the optimal recommendations will require measures such as adding managed pollinators, or enhancing the landscape and linear elements (e.g. flower strips) to imporve pollination. On the contrary, values well above the optional recommendations indicate that managed pollinators migh be at too high densities. Given the known negative effects of managed pollinators at high densities (REFS), this can be a powerful tool to convince farmers to reduce its numbers when visitation rates are too high. In fact, many crops will suffer negative effects when managed polliantors are too abundant, as stigmas can be damaged (Saez et al) and having critical numbers on when high is too high can rapidely became an useful tool.
+
+We encourage researchers to use our modelling framework, for which a dedicate R package is provided. Only by contrasting modelled and observed data we can enhance models and make then usefull (Dietze et al). It's been more than 5 years since we proposed to better monitor pollinator inouts in agroecosystems (Garibaldi et al 2020). This paper has recieved more than 100 citations, but just a handfull of those actually provide critical thresholds for pollinator optimal visitation rates. The time is ready for developing this numbers and use them in applied settings.
