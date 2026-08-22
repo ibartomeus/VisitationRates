@@ -1,6 +1,6 @@
 ---
 title: "Predictions of optimal pollinator visit rates to crops using simple mechanistic models"
-format: html
+format: pdf
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -64,11 +64,11 @@ abline(h = 100, lty = 2, col = "brown")
 lines(y = c(-2,95), x = c(ovr,ovr), lty = 2, col = "blue")
 lines(y = c(-2,40), x = c(1,1), lty = 2)
 points(x = 1, y = 40, pch = 19)
-text(x = 2, y = 20, "a = selfing rate", col = "darkgrey")
-text(x = 4.3, y = 40, "SVE = single visit efficiency")
-text(x = 6, y = 58, "c = diminishing returns param.", col = "red")
-text(x = 2, y = 95, "b = maximum seed set", col = "brown")
-text(x = 12, y = 80, "OVR = optimal visits", col = "blue")
+text(x = 2, y = 20, "a = selfing rate", col = "darkgrey", cex = 0.7)
+text(x = 4.3, y = 40, "SVE = single visit efficiency", cex = 0.7)
+text(x = 6, y = 58, "c = diminishing returns param.", col = "red", cex = 0.7)
+text(x = 2, y = 95, "b = maximum seed set", col = "brown", cex = 0.7)
+text(x = 12, y = 80, "OVR = optimal visits", col = "blue", cex = 0.7)
 ```
 
 **Figure 1:** Theoretical explanation of the modelling framework. The plot shows the intercept value defined as $a$ (in grey), which is defined as the percentage of seeds obtained with no animal pollination or selfing rates. Parameter $b$ defines the maximum seed set attainable seed set (in brown). Parameter $c$ describes the form of the curve (in red). We also show how single visit efficiency (SVE, in black) can be used to fit the curve, and the optimal visitation rate (OVR, in blue) defined as the number of visits required to attain the 95% of the maximum seed set.
@@ -284,7 +284,7 @@ all_data <- read.csv("data/parameters_real_crops.csv")
 #head(all_data)
 all_data <- all_data[-c(5,6),] #removing BB varieties
 
-par(mfrow=c(2,2))
+par(mfrow=c(2,2), mar=c(3, 4, 1, 0.5))
 plot(all_data$OVR, all_data$OVR_model, 
      ylim = c(0,max(all_data$OVR,all_data$OVR_model)+5), 
      xlim = c(0,max(all_data$OVR,all_data$OVR_model)+5),   
@@ -312,7 +312,7 @@ plot(all_data$c, all_data$c_model,
      xlab = "Obs_c", ylab = "Model_c",
      col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
 abline(0, 1)
-par(mfrow=c(1,1))
+par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
 ```
 
 **Figure 4:** Comparision for the four main parameters ($a$, $b$, $c$, and $OVR$) for data driven and mechanistic models. Using the same five crops, we compare empirically derived $a$, $b$, $c$, and $OVR$ parameters, with $a$, $b$, $c$, and $OVR$ predictions in a scatter plot with the 1:1 line plotted.
