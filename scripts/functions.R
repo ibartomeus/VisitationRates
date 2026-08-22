@@ -118,7 +118,10 @@ calculate_visits <- function(a, b, SVD, from_ = 0, to_ = 100,
   if(is.na(c_start) | is.infinite(c_start)) c_start <- 0.1
   nlmod3 <- nls(poldep2 ~  ((b*a)/100) + (b-((b*a)/100)) * (1-exp(-c*visits)), 
                 start = list(c = c_start),
-                control= nls.control(maxiter = 2000, minFactor = 1/2048, warnOnly = TRUE))
+                control= nls.control(maxiter = 2000, 
+                                     minFactor = 1/2048, 
+                                     warnOnly = TRUE,
+                                     scaleOffset = 1))
   #summary(nlmod3)
   c <- coef(nlmod3)
   c_se <- summary(nlmod3)$coefficients[2]
