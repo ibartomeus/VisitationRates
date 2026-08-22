@@ -318,7 +318,17 @@ plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(Rabbiteye.Blueberry$Number.of.v
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
-#not adding it here... flat line.
+
+rbb_data <- data.frame(crop = c("Rabbiteye.Blueberry"),
+                        D_R2 = max(R2_lm, R2_cuadratic)- R2_nls,
+                        D_AIC = max(AIC_lm, AIC_cuadratic)- AIC_nls, 
+                        a = mf["a"],
+                        b = mf["b"],
+                        c = mf["c"],
+                        OVR = calculate_required_visits(a = mf["a"],
+                                                        b = mf["b"],
+                                                        c_val = mf["c"]))
+all_data <- rbind(all_data, rbb_data)
 ```
 
 Quite similar fits again...
@@ -411,10 +421,10 @@ all_data$b_model <- NA
 all_data$c_model <- NA
 all_data$OVR_model <- NA
 #add
-all_data$a_model[6] <- d$a[1]
-all_data$b_model[6] <- d$b[1]
-all_data$c_model[6] <- params$c_parameter
-all_data$OVR_model[6] <- OVR_model
+all_data$a_model[7] <- d$a[1]
+all_data$b_model[7] <- d$b[1]
+all_data$c_model[7] <- params$c_parameter
+all_data$OVR_model[7] <- OVR_model
 
 #loop for all? As only 5, I'll do manually
 #highbush blueberry
@@ -425,10 +435,10 @@ params <- calculate_visits(a = d$a[2], b = d$b[2], SVD = d$SV[2],
 #And visits needed.
 OVR_model <- calculate_required_visits(a = d$a[2], b = d$b[2], c_val = params$c_parameter) 
 #store data along with the other data
-all_data$a_model[5] <- d$a[2]
-all_data$b_model[5] <- d$b[2]
-all_data$c_model[5] <- params$c_parameter
-all_data$OVR_model[5] <- OVR_model
+all_data$a_model[4] <- d$a[2]
+all_data$b_model[4] <- d$b[2]
+all_data$c_model[4] <- params$c_parameter
+all_data$OVR_model[4] <- OVR_model
 
 #apple
 #Now we can calculate the curve (c):
@@ -468,6 +478,9 @@ all_data$a_model[3] <- d$a[6]
 all_data$b_model[3] <- d$b[6]
 all_data$c_model[3] <- params$c_parameter
 all_data$OVR_model[3] <- OVR_model
+
+#save file
+write.csv(all_data, file = "data/parameters_real_crops.csv")
 
 #plot 1:1 plot
 all_data <- all_data[-4,]
