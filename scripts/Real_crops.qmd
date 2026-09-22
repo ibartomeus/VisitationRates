@@ -103,7 +103,7 @@ all_data <- data.frame(crop = c("apple"),
                        c = mf["c"],
                        OVR = calculate_required_visits(a = mf["a"],
                                                        b = mf["b"],
-                                                       c_val = mf["c"]))
+                                                       c_val = mf["c"],target_percent = 0.8))
 ```
 
 Best fit according to AIC is our nls model.
@@ -154,7 +154,7 @@ sb_data <- data.frame(crop = c("strawberry"),
                        c = mf["c"],
                        OVR = calculate_required_visits(a = mf["a"],
                                                        b = mf["b"],
-                                                       c_val = mf["c"]))
+                                                       c_val = mf["c"],target_percent = 0.8))
 all_data <- rbind(all_data, sb_data)
 ```
 
@@ -250,7 +250,7 @@ shbb_data <- data.frame(crop = c("SHighbushBlueberry"),
                       c = mf["c"],
                       OVR = calculate_required_visits(a = mf["a"],
                                                       b = mf["b"],
-                                                      c_val = mf["c"]))
+                                                      c_val = mf["c"],target_percent = 0.8))
 all_data <- rbind(all_data, shbb_data)
 ```
 
@@ -301,7 +301,7 @@ nhbb_data <- data.frame(crop = c("NHighbushBlueberry"),
                         c = mf["c"],
                         OVR = calculate_required_visits(a = mf["a"],
                                                         b = mf["b"],
-                                                        c_val = mf["c"]))
+                                                        c_val = mf["c"],target_percent = 0.8))
 all_data <- rbind(all_data, nhbb_data)
 ```
 
@@ -353,7 +353,7 @@ rbb_data <- data.frame(crop = c("Rabbiteye.Blueberry"),
                         c = mf["c"],
                         OVR = calculate_required_visits(a = mf["a"],
                                                         b = mf["b"],
-                                                        c_val = mf["c"]))
+                                                        c_val = mf["c"],target_percent = 0.8))
 all_data <- rbind(all_data, rbb_data)
 ```
 
@@ -409,7 +409,7 @@ wm_data <- data.frame(crop = c("Watermelon"),
                         c = mf["c"],
                         OVR = calculate_required_visits(a = mf["a"],
                                                         b = mf["b"],
-                                                        c_val = mf["c"]))
+                                                        c_val = mf["c"], target_percent = 0.8))
 all_data <- rbind(all_data, wm_data)
 
 #save dataset
@@ -425,6 +425,8 @@ We use paremetres from the litearture.
 d <- read.csv("data/VisitationRates_ParameterData.csv")
 head(d)
 
+d$a <- d$a_seed_set
+d$b <- d$b_ovules
 #param a is in %
 d$a <- (d$a/ d$b)*100
 

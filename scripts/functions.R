@@ -7,10 +7,10 @@ V_transect_to_flower <- function(V_transect, flw_x_m2, lifespan){
 
 #V_transect_to_flower(V_transect = 50, flw_x_m2 = 100, lifespan = 8)
 
-plot_visits <- function(a, b, c, from_ = 0, to_ = 1, add_ = FALSE, col_ = 2){
+plot_visits <- function(a, b, c, from_ = 0, to_ = 1, add_ = FALSE, col_ = 2, ...){
   a2 <- (b*a)/100
   b2 <- b-a2
-  curve(a2+b2*(1-exp(-c*x)), from = from_, to = to_, add = add_, col = col_, ylim = c(0, b), las = 1)
+  curve(a2+b2*(1-exp(-c*x)), from = from_, to = to_, add = add_, col = col_, ylim = c(0, b), las = 1, ...)
 }
 
 #plot_visits(a = 30, b = 200, c = 10, add = FALSE)
