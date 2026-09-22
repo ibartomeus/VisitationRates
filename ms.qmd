@@ -6,7 +6,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-Ignasi Bartomeus, Maxime Eeaerts, Mike Garratt, Jake Bishop, Tom Breeze?
+Ignasi Bartomeus, Maxime Eeaerts, Mike Garratt, Jake Bishop, Tom Breeze, Ellen Knight.
 
 ## Abstract
 
@@ -85,13 +85,16 @@ Overall, we highlight the large variability observed in all models and crops, in
 dat <- read.csv("data/VisitationRates_Data.csv")
 #make a dataset per crop
 #unique(dat$Crop)
-LimaBean <- subset(dat, Crop == "Lima.bean")
+#LimaBean <- subset(dat, Crop == "Lima.bean")
 Strawberry <- subset(dat, Crop == "Strawberry") 
 SHighbushBlueberry <- subset(dat, Crop == "Southern.Highbush.Blueberry")  
 NHighbushBlueberry <- subset(dat, Crop == "Northern.Highbush.Blueberry")
 Rabbiteye.Blueberry <- subset(dat, Crop == "Rabbiteye.Blueberry")
 Apple <- subset(dat, Crop == "Apple")
 Watermelon <- subset(dat, Crop == "Watermelon")
+
+#mean(subset(Watermelon, Watermelon$Number.of.visits == 30)[,"PollinationValue"])
+
 ```
 
 ```{r}
@@ -111,14 +114,14 @@ model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2
 mf <- fit_data(seedset = Apple$PollinationValue, visitation = Apple$Number.of.visits, simplify = "params")
 
 #Plot
-par(mfrow=c(2,3))
+par(mfrow=c(2,2))
 plot(Apple$PollinationValue ~ jitter(Apple$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", main = "Apple")
 plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add = TRUE, col = "#009E73")
 
 #Strawberry
-Strawberry <- subset(Strawberry, Pollinator %in% c("Apis mellifera", "Andrena.spp", "Ceratina.spp"))
+#Strawberry <- subset(Strawberry, Pollinator %in% c("Apis mellifera", #"Andrena.spp", "Ceratina.spp"))
 
 #fit models
 model_nls <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "model",
@@ -130,27 +133,12 @@ model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2
 mf <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "params", a_start = 10, b_start = 100, c_start = 0.5)
 
 #Plot
-plot(Strawberry$PollinationValue ~ jitter(Strawberry$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", xlim = c(0,20), , main = "Strawberry")
-plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
+plot(Strawberry$PollinationValue ~ jitter(Strawberry$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", xlim = c(0,20), main = "Strawberry")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(Strawberry$Number.of.visits), add_ = TRUE, col = "#E69F00")
 plot_visits(mf["a"], mf["b"], mf["c"], to_ = 30, add_ = TRUE, col = "#E69F00")
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), 
       add = TRUE, col = "#009E73")
-
-#Lime Bean
-#fit models
-model_nls <- fit_data(seedset = LimaBean$PollinationValue, visitation = LimaBean$Number.of.visits, simplify = "model")
-model_lm <- lm(LimaBean$PollinationValue ~ LimaBean$Number.of.visits)
-model_cuadratic <- lm(PollinationValue ~ Number.of.visits + I(Number.of.visits^2), data = LimaBean)
-
-#Extract a, b and c values
-mf <- fit_data(seedset = LimaBean$PollinationValue, visitation = LimaBean$Number.of.visits, simplify = "params")
-
-#Plot
-plot(LimaBean$PollinationValue ~ jitter(LimaBean$Number.of.visits), las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", main = "Lime Bean")
-plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(LimaBean$Number.of.visits), add_ = TRUE, col = "#E69F00")
-abline(model_lm, col = "#56B4E9")
-curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add = TRUE, col = "#009E73")
 
 #Blueberry
 SHighbushBlueberry <- subset(SHighbushBlueberry, PollinationMetric == "Fruit.weight")
@@ -175,6 +163,8 @@ curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add 
 
 #Watermelon
 #fit models
+Watermelon <- subset(Watermelon, Watermelon$Number.of.visits != 30)
+
 model_nls <- fit_data(seedset = Watermelon$PollinationValue, 
                       visitation = Watermelon$Number.of.visits, simplify = "model", a_start = 75, b_start = 300)
 model_lm <- lm(Watermelon$PollinationValue ~ Watermelon$Number.of.visits)
@@ -187,8 +177,8 @@ mf <- fit_data(seedset = Watermelon$PollinationValue,
 
 #Plot
 plot(Watermelon$PollinationValue ~ jitter(Watermelon$Number.of.visits), 
-     las = 1, xlab = "Visits", ylab = "Seed set", col = "grey", main = "Watermelon")
-plot_visits(mf["a"], mf["b"], mf["c"], to_ = max(Watermelon$Number.of.visits), 
+     las = 1, xlab = "Visits", ylab = "Seed set", xlim = c(0,30), col = "grey", main = "Watermelon")
+plot_visits(mf["a"], mf["b"], mf["c"], to_ = 30, 
             add_ = TRUE, col = "#E69F00")
 abline(model_lm, col = "#56B4E9")
 curve(predict(model_cuadratic, newdata = data.frame(Number.of.visits = x)), add = TRUE, col = "#009E73")
@@ -215,19 +205,18 @@ Using the generalized modelling approach, we calculated optimal visitation rates
 dat <- read.csv("data/VisitationRates_ParameterData.csv")
 #head(dat)
 dat <- dat[-24,] #removing cheak peas, which is wierd as a = b = SV
+#rename params
+dat$a <- dat$a_seed_set
+dat$b <- dat$b_ovules
 
-#param a (literature) is in %
+#param a (literature) need to be in %
 dat$a_emp <- (dat$a / dat$b)*100
 
 #param a as in Sipoa (already in %)
-dat$a <- (1 - dat$a_siopa)*100
+dat$a_siopa_seed_set <- dat$b * (1 - dat$a_siopa)
 #remove NA's
 #dat <- dat[-which(is.na(dat$a)),]
 
-#plot(dat$a_emp, dat$a, xlim = c(0,100), ylim = c(0,100), xlab = "a_literature", ylab = "a_Siopa", las = 1)
-#abline(0, 1)
-
-dat$a <- dat$a_emp
 
 #SV we can take the average
 dat$SV <- rowMeans(dat[,c("Honeybee", "Bumblebee", 
@@ -235,6 +224,21 @@ dat$SV <- rowMeans(dat[,c("Honeybee", "Bumblebee",
 #But some are wierd
 dat$SV[which(dat$Crop == "cherry")] <- 0.25 #Using only wild bees.
 dat$SV[which(dat$Crop == "strawberry")] <- 150 #Using max efficiency...
+
+#plot siope vs SV
+#par(mfrow=c(1,2))
+plot(x = dat$a_siopa_seed_set, y = dat$SV, xlim = c(0,950), ylim = c(0,950), xlab = "a (Sipoa)", ylab = "SVE", las = 1)
+abline(0, 1)
+
+plot(x = dat$a_siopa_seed_set, y = dat$SV, xlim = c(0,100), ylim = c(0,100), xlab = "a (Sipoa)", ylab = "SVE", las = 1)
+abline(0, 1)
+#par(mfrow=c(1,1))
+
+#length(which(dat$a_siopa_seed_set > dat$SV))
+#11 crops show larger selfing rates than SVE...
+
+#create final a
+dat$a <- dat$a_emp
 
 #output data frame
 out <- data.frame(crop = rep(NA,nrow(dat)), 
@@ -262,14 +266,25 @@ for(i in 1:nrow(dat)){
   out$OVR[i] <- OVR_model
 }
 
-par(mfrow=c(1,2), mar=c(8, 4, 1.5, 0.5))
-bymedian <- with(out, reorder(family, -OVR, median))
-boxplot(out$OVR ~ bymedian, las = 2, xlab = "", ylab = "OVR")
-bymedian <- with(out, reorder(crop, -OVR, median))
-boxplot(out$OVR ~ bymedian, las = 2, xlab = "", ylab = "OVR",
-        cex.axis = 0.5)
+par(mfrow=c(5,5), mar=c(3, 3, 1, 0.5))
+for(i in 1:25){
+  plot_visits(a = out$a[i], b = out$b[i], c = out$c[i], 
+              xlab = "seed set", ylab = "visits",
+              to_ = 20, main = out$crop[i])
+}
 par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
 
+
+
+par(mfrow=c(1,1), mar=c(7, 4.2, 1.5, 0.5))
+#bymedian <- with(out, reorder(family, -OVR, median))
+#boxplot(out$OVR ~ bymedian, las = 2, xlab = "", ylab = "OVR")
+bymedian <- with(out, reorder(crop, -OVR, median))
+boxplot(out$OVR ~ bymedian, las = 2, xlab = "", ylab = "Optimal visitation rate",
+        cex.axis = 0.75)
+par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
+abline(h = 5, lty = 2)
+abline(h = 10, lty = 2)
 #parameter influence? To SUp Mat?
 #scatter.smooth(out$OVR ~ out$a, las = 1)
 #scatter.smooth(out$OVR ~ out$b, las = 1)
@@ -311,7 +326,7 @@ for(i in 1:nrow(spec_dat)){
   params <- calculate_visits(a = spec_dat$a[i], b = spec_dat$b_specific[i], SVD = spec_dat$SVE_specific[i], 
                              plot_ = FALSE)
   #And visits needed.
-  OVR_model <- calculate_required_visits(a = spec_dat$a[i], b = spec_dat$b[i], c_val = params$c_parameter) 
+  OVR_model <- calculate_required_visits(a = spec_dat$a[i], b = spec_dat$b[i], c_val = params$c_parameter, target_percent = 0.80) 
   #store the data
   out2$a[i] <- spec_dat$a[i]
   out2$b[i] <- spec_dat$b_specific[i]
@@ -319,65 +334,66 @@ for(i in 1:nrow(spec_dat)){
   out2$SVE[i] <- spec_dat$SVE_specific[i]
   out2$OVR[i] <- OVR_model
 }
-par(mfrow=c(2,2), mar=c(3, 4, 1, 0.5))
-plot(all_data$OVR, out2$OVR, 
-     #ylim = c(0,max(all_data$OVR,out2$OVR)+5), 
-     #xlim = c(0,max(all_data$OVR,out2$OVR)+5),   
-     ylim = c(0,40), 
-     xlim = c(0,40),  
-     xlab = "Obs_OVR", ylab = "Model_OVR", 
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
-abline(0, 1)
-plot(all_data$a, out2$a, 
+par(mfrow=c(2,2), mar=c(4, 4, 1.5, 0.5))
+plot(all_data$a[-3], out2$a[-3], 
      ylim = c(0,max(all_data$a,out2$a)+5), 
      xlim = c(0,max(all_data$a,out2$a)+5),  
      xlab = "Obs_a", ylab = "Model_a",
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+     col = c("green", "red", "blue","darkgreen"), las = 1)
 abline(0, 1)
-plot(all_data$b, out2$b, 
+plot(all_data$b[-3], out2$b[-3], 
      ylim = c(0,max(all_data$b,out2$b)+5), 
      xlim = c(0,max(all_data$b,out2$b)+5), 
      xlab = "Obs_b", ylab = "Model_b",
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+     col = c("green", "red", "blue","darkgreen"), las = 1)
 abline(0, 1)
 
-plot(all_data$c, all_data$c_model, 
-     ylim = c(0,max(all_data$c,out2$c)+5), 
-     xlim = c(0,max(all_data$c,out2$c)+5),  
+plot(all_data$c[-3], all_data$c_model[-3], 
+     ylim = c(0,max(all_data$c,out2$c)+1), 
+     xlim = c(0,max(all_data$c,out2$c)+1),  
      xlab = "Obs_c", ylab = "Model_c",
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+     col = c("green", "red", "blue","darkgreen"), las = 1)
+abline(0, 1)
+plot(all_data$OVR[-3], out2$OVR[-3], 
+     #ylim = c(0,max(all_data$OVR,out2$OVR)+5), 
+     #xlim = c(0,max(all_data$OVR,out2$OVR)+5),   
+     ylim = c(0,20), 
+     xlim = c(0,20),  
+     xlab = "Obs_OVR", ylab = "Model_OVR", 
+     col = c("green", "red", "blue","darkgreen"), las = 1)
 abline(0, 1)
 par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
 #######END detour
 
-par(mfrow=c(2,2), mar=c(3, 4, 1, 0.5))
-plot(all_data$OVR, all_data$OVR_model, 
-     ylim = c(0,max(all_data$OVR,all_data$OVR_model)+5), 
-     xlim = c(0,max(all_data$OVR,all_data$OVR_model)+5),   
-     xlab = "Obs_OVR", ylab = "Model_OVR", 
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
-abline(0, 1)
-#Not too satisfactory... specially strawberry, but also watermelon and lima bean
-plot(all_data$a, all_data$a_model, 
-     ylim = c(0,max(all_data$a,all_data$a_model)+5), 
-     xlim = c(0,max(all_data$a,all_data$a_model)+5),  
+#Sup mat S1
+par(mfrow=c(2,2), mar=c(4, 4, 1, 0.5))
+plot(all_data$a[-3], all_data$a_model[-3], 
+     ylim = c(0,40), 
+     xlim = c(0,40),  
      xlab = "Obs_a", ylab = "Model_a",
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+     col = c("green", "red", "blue","darkgreen"), las = 1)
 abline(0, 1)
 
-plot(all_data$b, all_data$b_model, 
+plot(all_data$b[-3], all_data$b_model[-3], 
      ylim = c(0,max(all_data$b,all_data$b_model)+5), 
      xlim = c(0,max(all_data$b,all_data$b_model)+5), 
      xlab = "Obs_b", ylab = "Model_b",
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+     col = c("green", "red", "blue","darkgreen"), las = 1)
 abline(0, 1)
 
-plot(all_data$c, all_data$c_model, 
-     ylim = c(0,max(all_data$c,all_data$c_model)+5), 
-     xlim = c(0,max(all_data$c,all_data$c_model)+5),  
+plot(all_data$c[-3], all_data$c_model[-3], 
+     ylim = c(0,max(all_data$c,all_data$c_model)), 
+     xlim = c(0,max(all_data$c,all_data$c_model)),  
      xlab = "Obs_c", ylab = "Model_c",
-     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+     col = c("green", "red", "blue","darkgreen"), las = 1)
 abline(0, 1)
+plot(all_data$OVR[-3], all_data$OVR_model[-3], 
+     ylim = c(0,max(all_data$OVR,all_data$OVR_model)), 
+     xlim = c(0,max(all_data$OVR,all_data$OVR_model)),   
+     xlab = "Obs_OVR", ylab = "Model_OVR", 
+     col = c("green", "red", "blue","darkgreen"), las = 1)
+abline(0, 1)
+#Not too satisfactory... specially strawberry, but also watermelon and lima bean
 par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
 ```
 
@@ -444,7 +460,7 @@ REB_c <- calculate_visits(a = REB_a, b = REB_b, SVD = REB_SVE, to_ = 15)$c_param
 #now we can plot all three
 par(mfrow=c(1,2))
 plot(SHighbushBlueberry$PollinationValue ~ jitter(SHighbushBlueberry$Number.of.visits), 
-     las = 1, xlab = "Visits", ylab = "Fruit weigth", type = "n", main = "Different varieties",
+     las = 1, xlab = "Visits", ylab = "Fruit weigth", type = "n", main = "Different blueberry crops",
      ylim = c(0,4), xlim = c(0,15))
 plot_visits(SHB_a, SHB_b, SHB_c, to_ = 15, 
             add_ = TRUE, col = "#223366")
