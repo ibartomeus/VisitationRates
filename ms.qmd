@@ -8,17 +8,15 @@ editor_options:
 
 Ignasi Bartomeus, Maxime Eeaerts, Mike Garratt, Jake Bishop, Tom Breeze?
 
-\[Question: Should we invite Liam Kendall, given we use his data? Or is it fine like this, as is publicly available?\]
-
 ## Abstract
 
-While the positive effect of pollinators on crop production has been clearly demonstrated, crop level predictions of how pollinator visit rates increase crops reproductive success remains elusive and requires time consuming experiments. Defining the functional form of this relationships is of pivotal importance to understand when pollination is limiting, and to develop operational visitation rate values that can be used by practitioners to rapidly assess pollination levels. Given the large variety of crops, and varieties, running detailed experiments for all of them is unlikely to be achieved in the short term. Here we propose and test a generalized mechanistic model based on biological first principles to infer optimal pollinator visitation rates for multiple crops. First we show that a non-inflicted functional form fits well empirical data. Second, we develop and test a flexible model to produce this functional forms from easy to obtain plant and pollinator traits such as plant's selfing rates, ovule number, and pollinator single visit efficiency. Finally, we apply our framework to 26 crops and ilustrate its flexibility using blueberries as a case study to show the advantages and limitations of the framework. An R package is provided to facilitate the uptake of this modelling framework by practitioners.
+While the positive effect of pollinators on crop production has been clearly demonstrated, crop level predictions of how pollinator visit rates increase crops reproductive success remains elusive and requires many time consuming experiments. Defining the functional form of this relationships is of pivotal importance to understand when pollination is limiting, and to develop operational visitation rate values that can be used by practitioners to rapidly assess pollination levels. Given the large variety of crops, and varieties, running detailed experiments for all of them is unlikely to be achieved in the short term. Here we propose and test a generalized mechanistic model based on biological first principles to infer optimal pollinator visitation rates for multiple crops. First we show that a non-inflicted functional form fits well empirical data. Second, we develop and test a flexible model to produce this functional forms from easy to obtain plant and pollinator traits such as plant's selfing rates, ovule number, and pollinator single visit efficiency. Finally, we apply our framework to 26 crops and ilustrate its flexibility using blueberries as a case study to show the advantages and limitations of the framework. An R package is provided to facilitate the uptake of this modelling framework by practitioners.
 
 ## Introduction
 
 Agronomic research have a long history of quantifying the optimal inputs needed for optimizing crop production. For example, control trials have provided clear guidelines on optimal fertilizer use, irrigation, or pesticide application (ref?). However, insect pollination remained hard to measure, and was traditionally assumed to be either non-limiting, or easily covered by stocking managed pollinators *ad libitum* (Garibaldi et al 2020). However, in the last 20 years the importance of both managed and wild pollinators has been made evident, mainly trough synthesis papers showing a positive relationship between pollinator visitation and crop production (Garibaldi et al. 2013, Rader et al. 2016, Reilly et al. 2025). Consequently, the interest for managing crop pollination with both managed and wild pollinators has increased (Garibaldi et al 2015 Frontiers). Despite this efforts, the intrinsic variability across crops and varieties (Reilly et al. 2025), the assumption of linear relationships between pollinator visitation and yield efefcts (Eeaerts et al. 2026), and the confounding factors affecting yield beyond pollinators (Deguines et al. 2010), has prevented the emergence of clear guidelines suggesting optimal pollinator visitation rates for different crops (Garibaldi et al 2020).
 
-Crop yield is affected by many factors, including fertilizers, water availability, or cropping density. Hence synthesis of observational studies risk confounding the effects of pollination on crops when pollinator availability is correlated with any of this factors (Chabert et al. 2026, Aizen et al 2025 PCI). Moreover, most analysis make statistical simplifications such as assuming a linear relationship, despite it has been shown that non linear, quadratic, relationship often fits better the data (Morris et al 2004, Eeaerts et al. 2026). The consequences is that even simple metrics such as how many visits per flower are needed to ensure pollination is not limiting are hard to extract from this type of observational analysis, even when crops are analyzed one by one (Reilly et al. 2025, Eeaerts et al. XXXX). As an alternative, controlled experiments, where crop resources are kept constant, and the number of visits per flower are tracked can provide detailed information on how many visits by different pollinators are needed to maximize crop yield (Refs Garratt, etc...). However, this experiments are terribly time consuming, and hence have only been done for a handful of crops (refs). Even within those crops, striking differences are observed depending of the cultivar, environmental conditions used, and the pollinator community available. For example, \[search for an example of a crop where recommended visitation rate changes by study - Maxime?\]. Overall, this suggests that experiments might be hard to generalize.
+Crop yield is affected by many factors, including fertilizers, water availability, or cropping density. Hence synthesis of observational studies risk confounding the effects of pollination on crops when pollinator availability is correlated with any of this factors (Chabert et al. 2026, Aizen et al 2025 PCI). Moreover, most analysis make statistical simplifications such as assuming a linear relationship, despite it has been shown that non linear, quadratic, relationship often fits better the data (Morris et al 2004, Eeaerts et al. 2026). The consequences is that even simple metrics such as how many visits per flower are needed to ensure pollination is not limiting are hard to extract from this type of observational analysis, even when crops are analyzed one by one (Reilly et al. 2025, Eeaerts et al. XXXX). As an alternative, controlled experiments, where crop resources are kept constant, and the number of visits per flower are tracked can provide detailed information on how many visits by different pollinators are needed to maximize crop yield (Refs Garratt, etc...). However, this experiments are terribly time consuming, and hence have only been done for a handful of crops (refs). Even within those crops, striking differences are observed depending of the cultivar, environmental conditions used, and the pollinator community available. For example, \[search for an example of a crop where recommended visitation rate changes by study - Maxime? Probably something we can find for blueberry or apple (or the Kendall study itself to state it varies for related blueberry crops?) But also Thomson and Goodell 2001 J Appl Ecol for apple (SFV for two apple and almond cultivars, yet the pollen deposited is similar for the two cultivars)\]. Overall, this suggests that experiments might be hard to generalize.
 
 Here, we propose a well known functional form relating pollinator visitation to crop production: the non-inflicted curve (Morris et al. 2004). The advantage of this functional form over statistical quadratic fits is that its parameters have biological meaning. The curve is defined by three parameters which govern the relationship between pollinator visitation rates and crop seed set. Parameter $a$ sets the y-intercept (i.e., seed set for unvisited flowers), parameter $b$ sets the asymptote (i.e., maximum seed set attainable by a single flower), and parameter $c$ governs the rate of approach to the asymptote (Fig. 1). All this parameters can be estimated from experimental or observational data, but can be also derived from first principles. For example, existing databases on selfing rates can inform about the expected intercepts (Kleijn et al 2007, Siopa et al 20XX). Similarly, the number of fertile ovules can be obtained from botanic manuals informing the maximum seed set attainable per flower. Finally, the rate of approach can be derived from the pollinator efficiency in a per visit unit (ref on SVE). This opens the door to derive mechanistic relationships for a wide variety of crops and contexts.
 
@@ -201,7 +199,7 @@ par(mfrow=c(1,1))
 
 **Figure 2:** Seed set as a function of visitation rate for data collected on five different crops. a) apple, b) strawberry, c) highbush blueberry, d) watermelon, e) lima bean. Blue lines repsent the linear fit, green lines the quadratic fits and orange lines the non-inflicted fucntional form.
 
-\[Note: AIC and R2 values to appendix? or in text?\]
+\[Note: AIC and R2 values to appendix? or in text? Maxime: Yes.\]
 
 \[**Question**: This data is tricky. Apple data from Mike is ok. Strawberry data does not saturate, which I wonder if they cover the right visits range (maybe we can add the open treatment to fix the upper bound? Maxime?. Lima Bean is terrible... zero is the most obtained value for any visitation rate!! Other studies on Lima bean show high autocompatiblity... should we discard this one? Blueberry looks good, but we use weight. Maxime, how would you explain without complicating the story that weight and seed set is highly correlated in methods? Watermelon is also ok-ish, but the V = 30 is the open visitation treatment... so I do not know this value for sure (not in the paper, I think), and this will affect the shape a bit... BUT overall, variation is huge eveywhere. Ideas on how to make this section more powerful are welcome\]
 
@@ -218,8 +216,18 @@ dat <- read.csv("data/VisitationRates_ParameterData.csv")
 #head(dat)
 dat <- dat[-24,] #removing cheak peas, which is wierd as a = b = SV
 
-#param a is in %
-dat$a <- (dat$a / dat$b)*100
+#param a (literature) is in %
+dat$a_emp <- (dat$a / dat$b)*100
+
+#param a as in Sipoa (already in %)
+dat$a <- (1 - dat$a_siopa)*100
+#remove NA's
+#dat <- dat[-which(is.na(dat$a)),]
+
+#plot(dat$a_emp, dat$a, xlim = c(0,100), ylim = c(0,100), xlab = "a_literature", ylab = "a_Siopa", las = 1)
+#abline(0, 1)
+
+dat$a <- dat$a_emp
 
 #SV we can take the average
 dat$SV <- rowMeans(dat[,c("Honeybee", "Bumblebee", 
@@ -243,7 +251,7 @@ for(i in 1:nrow(dat)){
                              plot_ = FALSE)
   #warning can be dissmissed.
   #And visits needed.
-  OVR_model <- calculate_required_visits(a = dat$a[i], b = dat$b[i], c_val = params$c_parameter) 
+  OVR_model <- calculate_required_visits(a = dat$a[i], b = dat$b[i], c_val = params$c_parameter, target_percent = 0.8) 
   #store the data
   out$crop[i] <- dat$Crop[i]
   out$family[i] <- dat$family[i]
@@ -264,6 +272,7 @@ par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
 
 #parameter influence? To SUp Mat?
 #scatter.smooth(out$OVR ~ out$a, las = 1)
+#scatter.smooth(out$OVR ~ out$b, las = 1)
 #scatter.smooth(out$OVR ~ out$c, las = 1)
 #scatter.smooth(out$OVR ~ out$SVE, las = 1)
 #It's a combination, but c is equivalent to OVR 
@@ -271,9 +280,9 @@ par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
 
 **Figure 3:** Model predictions of optimal visitation rates for 26 main EU crops grouped by plant families (A) and for individual crops (B). Boxplots show medians and ...
 
-\[**Question**: numbers look a bit high, and some even odd. I think we can use Siopa for a in % and try again. b is a bit high in general, as (maybe) ovules \> max seed set. SVD is what we can obtain... maybe using it in % of max seed set woul help standardize for varieties? We can discuss this in person\].
+\[**Question**: numbers look a bit high, and some even odd. I think we can use Siopa for a in % and try again. b is a bit high in general, as (maybe) ovules \> max seed set. SVD is what we can obtain... maybe using it in % of max seed set would help standardize for varieties? We can discuss this in person\].
 
-If we focus on the five crops for which we have also empiricall data, we can visually compare the models parameters for the data-driven values and mechanistic values (Fig. 4). In general, there is a decent agreement, but we tend to overestimate $b$ . This is not suprising, given the large variability observed in empirical data, where even well pollinated flowers show a large variation in seed set. As a consequence, OVR tend to be higher in the mechanistic model than in the empiriall data. Note that for example, watermelon seems to require less visits under the mechanistic model. This is because single visit values in the literature (Ref used, but also see REF), are much higher than for the data used to fit the model (\~200 seeds per visit vs \~50 seeds per visit). When using the 50 seeds per visit value the discrepancy is reduced. This indicates the importance of choosing the initial parameters well.
+If we focus on the five crops for which we have also empirical data, we can visually compare the models parameters for the data-driven values and mechanistic values (Fig. 4). In general, there is a decent agreement, but we tend to overestimate $b$ . This is not suprising, given the large variability observed in empirical data, where even well pollinated flowers show a large variation in seed set. As a consequence, OVR tend to be higher in the mechanistic model than in the empiriall data. Note that for example, watermelon seems to require less visits under the mechanistic model. This is because single visit values in the literature (Ref used, but also see REF), are much higher than for the data used to fit the model (\~200 seeds per visit vs \~50 seeds per visit). When using the 50 seeds per visit value the discrepancy is reduced. This indicates the importance of choosing the initial parameters well.
 
 ```{r}
 #| echo: false
@@ -283,6 +292,63 @@ If we focus on the five crops for which we have also empiricall data, we can vis
 all_data <- read.csv("data/parameters_real_crops.csv")
 #head(all_data)
 all_data <- all_data[-c(5,6),] #removing BB varieties
+
+#Detour: Obtain params from Fig 1
+#all_data$crop #"apple", "strawberry", "lima bean","SHighbushBlueberry", "Watermelon" 
+#Extracted from raw data in Real_crops
+spec_dat <- data.frame(a_specific = c(0.08, 64.6, 0.45, 0.35, 0),
+                       b_specific = c(10, 199, 3, 1.9, 338),
+                       SVE_specific = c(5.6, 74.1, 0.54, 0.84, 72.8))
+  
+spec_dat$a <- (spec_dat$a_specific / spec_dat$b_specific)*100
+out2 <- data.frame(a = rep(NA,nrow(spec_dat)), 
+                  b = rep(NA,nrow(spec_dat)), 
+                  c = rep(NA,nrow(spec_dat)), 
+                  SVE = rep(NA,nrow(spec_dat)), 
+                  OVR = rep(NA,nrow(spec_dat)))
+for(i in 1:nrow(spec_dat)){
+  #extract c
+  params <- calculate_visits(a = spec_dat$a[i], b = spec_dat$b_specific[i], SVD = spec_dat$SVE_specific[i], 
+                             plot_ = FALSE)
+  #And visits needed.
+  OVR_model <- calculate_required_visits(a = spec_dat$a[i], b = spec_dat$b[i], c_val = params$c_parameter) 
+  #store the data
+  out2$a[i] <- spec_dat$a[i]
+  out2$b[i] <- spec_dat$b_specific[i]
+  out2$c[i] <- params$c_parameter
+  out2$SVE[i] <- spec_dat$SVE_specific[i]
+  out2$OVR[i] <- OVR_model
+}
+par(mfrow=c(2,2), mar=c(3, 4, 1, 0.5))
+plot(all_data$OVR, out2$OVR, 
+     #ylim = c(0,max(all_data$OVR,out2$OVR)+5), 
+     #xlim = c(0,max(all_data$OVR,out2$OVR)+5),   
+     ylim = c(0,40), 
+     xlim = c(0,40),  
+     xlab = "Obs_OVR", ylab = "Model_OVR", 
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+plot(all_data$a, out2$a, 
+     ylim = c(0,max(all_data$a,out2$a)+5), 
+     xlim = c(0,max(all_data$a,out2$a)+5),  
+     xlab = "Obs_a", ylab = "Model_a",
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+plot(all_data$b, out2$b, 
+     ylim = c(0,max(all_data$b,out2$b)+5), 
+     xlim = c(0,max(all_data$b,out2$b)+5), 
+     xlab = "Obs_b", ylab = "Model_b",
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+
+plot(all_data$c, all_data$c_model, 
+     ylim = c(0,max(all_data$c,out2$c)+5), 
+     xlim = c(0,max(all_data$c,out2$c)+5),  
+     xlab = "Obs_c", ylab = "Model_c",
+     col = c("green", "red", "brown", "blue","darkgreen"), las = 1)
+abline(0, 1)
+par(mfrow=c(1,1), mar=c(4, 4, 1.5, 0.5))
+#######END detour
 
 par(mfrow=c(2,2), mar=c(3, 4, 1, 0.5))
 plot(all_data$OVR, all_data$OVR_model, 
@@ -455,3 +521,5 @@ VALOR, AGRI4POL
 ## References
 
 TBA
+
+<https://besjournals.onlinelibrary.wiley.com/doi/10.1111/j.1365-2435.2006.01189.x>

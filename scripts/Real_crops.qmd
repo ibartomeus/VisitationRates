@@ -37,6 +37,30 @@ NHighbushBlueberry <- subset(dat, Crop == "Northern.Highbush.Blueberry")
 Rabbiteye.Blueberry <- subset(dat, Crop == "Rabbiteye.Blueberry")
 Apple <- subset(dat, Crop == "Apple")
 Watermelon <- subset(dat, Crop == "Watermelon")
+
+#Calculate a, b and SVE
+#Run first the subsets scripted in each section
+
+#a
+mean(Apple$PollinationValue[which(Apple$Number.of.visits == 0)])
+mean(Strawberry$PollinationValue[which(Strawberry$Number.of.visits == 0)])
+mean(LimaBean$PollinationValue[which(LimaBean$Number.of.visits == 0)])
+mean(SHighbushBlueberry$PollinationValue[which(SHighbushBlueberry$Number.of.visits == 0)])
+mean(Watermelon$PollinationValue[which(Watermelon$Number.of.visits == 0)])
+
+#SVE
+mean(Apple$PollinationValue[which(Apple$Number.of.visits == 1)])
+mean(Strawberry$PollinationValue[which(Strawberry$Number.of.visits == 1)])
+mean(LimaBean$PollinationValue[which(LimaBean$Number.of.visits == 1)])
+mean(SHighbushBlueberry$PollinationValue[which(SHighbushBlueberry$Number.of.visits == 1)])
+mean(Watermelon$PollinationValue[which(Watermelon$Number.of.visits == 1)][-3]) #removing an outlier 223, doubling the next higher value (108).
+
+#b
+quantile(Apple$PollinationValue[which(Apple$Number.of.visits > 0)], probs = 0.95)
+quantile(Strawberry$PollinationValue[which(Strawberry$Number.of.visits > 0)], probs = 0.95)
+quantile(LimaBean$PollinationValue[which(LimaBean$Number.of.visits > 0)], probs = 0.95)
+quantile(SHighbushBlueberry$PollinationValue[which(SHighbushBlueberry$Number.of.visits > 0)], probs = 0.95)
+quantile(Watermelon$PollinationValue[which(Watermelon$Number.of.visits > 0)], probs = 0.95)
 ```
 
 ### Apple
@@ -88,10 +112,12 @@ Best fit according to AIC is our nls model.
 
 ```{r}
 #head(Strawberry)
-#table(Strawberry$Pollinator)  
+#table(Strawberry$Pollinator, Strawberry$Number.of.visits)  
+#library(reshape2)
+#dcast(Strawberry, Pollinator ~ Number.of.visits, fun.aggregate = mean, value.var = "PollinationValue")
 #unique(Strawberry$PollinationMetric)
 #needed?
-Strawberry <- subset(Strawberry, Pollinator %in% c("Apis mellifera", "Andrena.spp", "Ceratina.spp"))
+#Strawberry <- subset(Strawberry, Pollinator %in% c("Apis mellifera", "Andrena.spp", "Ceratina.spp"))
 
 #fit models
 model_nls <- fit_data(seedset = Strawberry$PollinationValue, visitation = Strawberry$Number.of.visits, simplify = "model",
@@ -338,7 +364,13 @@ Quite similar fits again...
 ```{r}
 #head(Watermelon)
 #unique(Watermelon$Pollinator) 
+#dcast(Watermelon, Pollinator ~ Number.of.visits, fun.aggregate = mean, value.var = "PollinationValue")
 #unique(Watermelon$PollinationMetric) 
+
+#Watermelon$Number.of.visits <- ifelse(Watermelon$Number.of.visits == 30, 40, Watermelon$Number.of.visits)
+
+Watermelon <- subset(Watermelon, Watermelon$Number.of.visits != 30)
+#avoid assuming things
 
 #fit models
 model_nls <- fit_data(seedset = Watermelon$PollinationValue, 
