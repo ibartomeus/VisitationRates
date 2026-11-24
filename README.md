@@ -1,9 +1,7 @@
-# VisitationRates
-Can we link visitation rates to plant reproductive success?
+# Predicting optimal pollinator visitation rates to crops using simple mechanistic models
 
+Ignasi Bartomeus^1, Maxime Eeaerts^1, Mike Garratt^2, Jake Bishop^2, Ellen Knight^2, Tom Breeze^2
 
-To do: 
+^1 Estación Biológica de Doñana (EBD-CSIC). Sevilla, Spain.
+^2 School of Agriculture, Policy and Development, University of Reading, Reading, Berkshire, RG6 6AR, UK.
 
-- Use Sipoa (as a is in %)? -> Siopa dependency data breaks everything.
-- Do Fig 3 for data in the same crop. -> Better, LimaBean and Watermelon still complex
-- Convert blueberry weight to seed set a priori.
