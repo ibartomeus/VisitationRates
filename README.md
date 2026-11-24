@@ -1,7 +1,8 @@
-# Predicting optimal pollinator visitation rates to crops using simple mechanistic models
-
+[![DOI](https://zenodo.org/badge/1050989794.svg)](https://doi.org/10.5281/zenodo.24499316)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/Data-CC%20BY%204.0-blue.svg)](LICENSE-data)
+
+# Predicting optimal pollinator visitation rates to crops using simple mechanistic models
 
 Ignasi Bartomeus^1, Maxime Eeraerts^1, Mike Garratt^2, Jake Bishop^2, Ellen Knight^2, Tom Breeze^2
 
