@@ -14,7 +14,7 @@ We will explore:
 
 - Kendall Blueberry data
 
-- Chirila Lima Bean data
+- Chirila Lima Bean data (discarded)
 
 - Kandori Strawberry data
 
@@ -25,7 +25,7 @@ We will explore:
 Load functions and data
 
 ```{r}
-source(file = "scripts/functions.R")
+library(VisitationR)
 
 dat <- read.csv("data/VisitationRates_Data.csv")
 #make a dataset per crop
@@ -81,7 +81,7 @@ AIC_lm <- AIC(model_lm) #2834
 AIC_cuadratic <- AIC(model_cuadratic) #2823
 
 #Extract R2
-R2_nls <- pseudeR2(model_nls, Apple$PollinationValue) #0.09
+R2_nls <- pseudo_R2(model_nls, Apple$PollinationValue) #0.09
 R2_lm <- summary(model_lm)$r.squared #0.01
 R2_cuadratic <- summary(model_cuadratic)$r.squared #0.03
 
@@ -131,7 +131,7 @@ AIC_lm <- AIC(model_lm) #6783
 AIC_cuadratic <- AIC(model_cuadratic) #6784
 
 #Extract R2
-R2_nls <- pseudeR2(model_nls, Strawberry$PollinationValue) #0.1
+R2_nls <- pseudo_R2(model_nls, Strawberry$PollinationValue) #0.1
 R2_lm <- summary(model_lm)$r.squared #0.09 #again best!
 R2_cuadratic <- summary(model_cuadratic)$r.squared #0.1
 
@@ -178,7 +178,7 @@ AIC_lm <- AIC(model_lm) #606 #BEST!!
 AIC_cuadratic <- AIC(model_cuadratic) #608
 
 #Extract R2
-R2_nls <- pseudeR2(model_nls, LimaBean$PollinationValue) #0.1
+R2_nls <- pseudo_R2(model_nls, LimaBean$PollinationValue) #0.1
 R2_lm <- summary(model_lm)$r.squared #0.09 #again best!
 R2_cuadratic <- summary(model_cuadratic)$r.squared #0.1
 
@@ -226,7 +226,7 @@ AIC_lm <- AIC(model_lm) #175 #BEST!!
 AIC_cuadratic <- AIC(model_cuadratic) #176
 
 #Extract R2
-R2_nls <- pseudeR2(model_nls, SHighbushBlueberry$PollinationValue) #0.1
+R2_nls <- pseudo_R2(model_nls, SHighbushBlueberry$PollinationValue) #0.1
 R2_lm <- summary(model_lm)$r.squared #0.09 #again best!
 R2_cuadratic <- summary(model_cuadratic)$r.squared #0.1
 
@@ -277,7 +277,7 @@ AIC_lm <- AIC(model_lm) #939
 AIC_cuadratic <- AIC(model_cuadratic) #935 ##BEST!
 
 #Extract R2
-R2_nls <- pseudeR2(model_nls, NHighbushBlueberry$PollinationValue) #0.1
+R2_nls <- pseudo_R2(model_nls, NHighbushBlueberry$PollinationValue) #0.1
 R2_lm <- summary(model_lm)$r.squared #0.09 #again best!
 R2_cuadratic <- summary(model_cuadratic)$r.squared #0.1
 
@@ -328,7 +328,7 @@ AIC_lm <- AIC(model_lm) #18
 AIC_cuadratic <- AIC(model_cuadratic) #19
 
 #Extract R2
-pseudeR2(model_nls, Rabbiteye.Blueberry$PollinationValue) #0.02
+pseudo_R2(model_nls, Rabbiteye.Blueberry$PollinationValue) #0.02
 summary(model_lm)$r.squared #0.02
 summary(model_cuadratic)$r.squared #0.02
 
@@ -384,7 +384,7 @@ AIC_lm <- AIC(model_lm) #1195.297
 AIC_cuadratic <- AIC(model_cuadratic) #1188.724
 
 #Extract R2
-R2_nls <- pseudeR2(model_nls, Watermelon$PollinationValue) #0.1
+R2_nls <- pseudo_R2(model_nls, Watermelon$PollinationValue) #0.1
 R2_lm <- summary(model_lm)$r.squared #0.09 #again best!
 R2_cuadratic <- summary(model_cuadratic)$r.squared #0.1
 

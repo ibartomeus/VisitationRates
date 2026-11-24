@@ -1,6 +1,5 @@
 #Final analysis
 
-#Source functions. Should be made into a package.
 # install.packages("remotes")
 #remotes::install_github("ibartomeus/VisitationR")
 library(VisitationR)
@@ -48,7 +47,7 @@ Watermelon <- subset(dat, Crop == "Watermelon")
 
 #Fig 3-----
 
-#AIC and R2 in Real_crops.qmd
+#AIC and R2 calculated in Real_crops.qmd
 
 #apple
 #fit models
